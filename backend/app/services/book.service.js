@@ -15,8 +15,8 @@ class BookService {
             book_released_year: payload.book_released_year,
             book_description: payload.book_description,
             book_slug: payload.book_slug,
+            book_authors: payload.book_authors,
             publisher_id: payload.publisher_id,
-            author_id: payload.author_id,
             topic_id: payload.topic_id,
         };
         return Helper.extractData(book);
@@ -42,12 +42,6 @@ class BookService {
                 localField: '_id',
                 foreignField: 'image_owner',
                 as: 'images',
-            })
-            .lookup({
-                from: 'authors',
-                localField: 'author_id',
-                foreignField: '_id',
-                as: 'author',
             })
             .lookup({
                 from: 'publishers',
@@ -77,12 +71,6 @@ class BookService {
                 localField: '_id',
                 foreignField: 'image_owner',
                 as: 'images',
-            })
-            .lookup({
-                from: 'authors',
-                localField: 'author_id',
-                foreignField: '_id',
-                as: 'author',
             })
             .lookup({
                 from: 'publishers',

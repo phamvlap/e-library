@@ -4,7 +4,6 @@ import 'dotenv/config';
 
 // routes
 import accountRoutes from './routes/account.route.js';
-import authorRoutes from './routes/author.route.js';
 import bookRoutes from './routes/book.route.js';
 import borrowingDetailRoutes from './routes/borrowingDetail.route.js';
 import readerRoutes from './routes/reader.route.js';
@@ -27,7 +26,6 @@ app.use(express.static('public'));
 
 // use routes
 app.use('/api/v1/accounts', accountRoutes);
-app.use('/api/v1/authors', authorRoutes);
 app.use('/api/v1/books', bookRoutes);
 app.use('/api/v1/borrowing-details', borrowingDetailRoutes);
 app.use('/api/v1/readers', readerRoutes);

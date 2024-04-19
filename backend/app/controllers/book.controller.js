@@ -73,8 +73,8 @@ class BookController {
                         lower: true,
                         trim: true,
                     }),
+                    book_authors: req.body.book_authors,
                     publisher_id: req.body.publisher_id,
-                    author_id: req.body.author_id,
                     topic_id: req.body.topic_id,
                     book_images: req.body.book_images,
                 };
@@ -135,8 +135,8 @@ class BookController {
                         lower: true,
                         trim: true,
                     }),
+                    book_authors: req.body.book_authors,
                     publisher_id: req.body.publisher_id,
-                    author_id: req.body.author_id,
                     topic_id: req.body.topic_id,
                     book_images: req.body.book_images,
                 };

@@ -30,15 +30,14 @@ const BookSchema = mongoose.Schema({
         type: String,
         required: [true, 'Please provide a book slug'],
     },
+    book_authors: {
+        type: String,
+        required: [true, 'Please provide a book author'],
+    },
     publisher_id: {
         type: mongoose.Types.ObjectId,
         ref: 'Publisher',
         required: [true, 'Please provide a publisher id'],
-    },
-    author_id: {
-        type: mongoose.Types.ObjectId,
-        ref: 'Author',
-        required: [true, 'Please provide a author id'],
     },
     topic_id: {
         type: mongoose.Types.ObjectId,

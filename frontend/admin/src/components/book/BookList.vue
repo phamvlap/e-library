@@ -1,15 +1,81 @@
 <script setup>
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faEye, faPen, faSearch, faAngleLeft, faAngleRight, faPlus } from '@fortawesome/free-solid-svg-icons';
+import BookService from '@/services/book.service.js';
+import TopicService from '@/services/topic.service.js';
+import Helper from '@/utils/helper.js';
 
 const router = useRouter();
+
+let books = ref([]);
+let topics = ref([]);
+let releasedYears = ref([]);
+let filter = ref({
+    topic: '',
+    released_year: '',
+    name: '',
+});
+
+const getBooks = async (filter = {}) => {
+    try {
+        const customFilter = {};
+        Object.keys(filter.value).map((key) => {
+            if (filter.value[key] !== '') {
+                customFilter[`book_${key}`] = filter.value[key];
+            }
+        });
+        if (Object.hasOwnProperty.call(customFilter, 'book_released_year')) {
+            customFilter.book_released_year = Number(customFilter.book_released_year);
+        }
+        const bookService = new BookService();
+        const response = await bookService.getBooks(customFilter);
+        if (response.status === 'success') {
+            const data = response.data.map((book) => {
+                return {
+                    _id: book._id,
+                    book_image: Helper.formatImageUrl(book.images[0].image_url),
+                    book_name: book.book_name,
+                    book_authors: book.book_authors,
+                    book_topic: book.topic[0].topic_name,
+                    book_quantity: book.book_quantity,
+                    book_released_year: book.book_released_year,
+                };
+            });
+            books.value = data;
+        }
+    } catch (error) {
+        books.value = [];
+    }
+};
+const getTopics = async () => {
+    try {
+        const topicService = new TopicService();
+        const response = await topicService.getTopics();
+        if (response.status === 'success') {
+            topics.value = response.data;
+        }
+    } catch (error) {
+        topics.value = [];
+    }
+};
+const getReleasedYears = async () => {
+    try {
+        const bookService = new BookService();
+        const response = await bookService.getReleasedYears();
+        if (response.status === 'success') {
+            releasedYears.value = response.data;
+        }
+    } catch (error) {
+        releasedYears.value = [];
+    }
+};
 const redirecToBookAdd = () => {
     router.push({
         name: 'book.add',
     });
 };
-
 const redirectToBookDetail = (id) => {
     router.push({
         name: 'book.detail',
@@ -18,6 +84,28 @@ const redirectToBookDetail = (id) => {
         },
     });
 };
+const redirectToBookModify = (id) => {
+    router.push({
+        name: 'book.edit',
+        params: {
+            id,
+        },
+    });
+};
+const handleFilter = async () => {
+    filter.value.name = '';
+    await getBooks(filter);
+};
+const handleSearch = async () => {
+    filter.value.topic = '';
+    filter.value.released_year = '';
+    await getBooks(filter);
+};
+onMounted(async () => {
+    await getBooks(filter);
+    await getTopics();
+    await getReleasedYears();
+});
 </script>
 
 <template>
@@ -35,26 +123,26 @@ const redirectToBookDetail = (id) => {
                 <div class="d-flex align-items-center justify-content-center">
                     <div class="input-group m-0">
                         <label class="input-group-text label" for="select-topic">Chủ đề</label>
-                        <select class="form-select" id="select-topic">
-                            <option class="select-item" selected>-- Chọn --</option>
-                            <option class="select-item" value="1">One</option>
-                            <option class="select-item" value="2">Two</option>
-                            <option class="select-item" value="3">Three</option>
+                        <select class="form-select" id="select-topic" v-model="filter.topic">
+                            <option class="select-item" value="">-- Chọn --</option>
+                            <option class="select-item" v-for="topic in topics" :value="topic._id" :key="topic._id">
+                                {{ topic.topic_name }}
+                            </option>
                         </select>
                     </div>
                 </div>
                 <div class="d-flex align-items-center ms-2">
                     <div class="input-group m-0">
-                        <label class="input-group-text label" for="select-topic">Năm phát hành</label>
-                        <select class="form-select" id="select-topic">
-                            <option class="select-item" selected>-- Chọn --</option>
-                            <option class="select-item" value="1">One</option>
-                            <option class="select-item" value="2">Two</option>
-                            <option class="select-item" value="3">Three</option>
+                        <label class="input-group-text label" for="select-released-year">Năm phát hành</label>
+                        <select class="form-select" id="select-released-year" v-model="filter.released_year">
+                            <option class="select-item" value="">-- Chọn --</option>
+                            <option class="select-item" v-for="year in releasedYears" :value="year" :key="year">
+                                {{ year }}
+                            </option>
                         </select>
                     </div>
                 </div>
-                <button class="btn btn-primary ms-3">Áp dụng</button>
+                <button class="btn btn-primary ms-3" @click="handleFilter">Áp dụng</button>
             </div>
             <!-- search -->
             <div>
@@ -64,8 +152,9 @@ const redirectToBookDetail = (id) => {
                         class="form-control"
                         placeholder="Nhập tên sách cần tìm"
                         aria-describedby="search-book"
+                        v-model="filter.name"
                     />
-                    <button class="btn btn-outline-secondary" type="button" id="search-book">
+                    <button class="btn btn-outline-secondary" type="button" id="search-book" @click="handleSearch">
                         <FontAwesomeIcon :icon="faSearch" />
                     </button>
                 </div>
@@ -86,64 +175,22 @@ const redirectToBookDetail = (id) => {
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <th scope="row">1</th>
+                <tr v-for="(book, index) in books" :key="index">
+                    <th scope="row">{{ index + 1 }}</th>
                     <td>
-                        <img class="cell-image" src="@/assets/images/truyen_kieu_1.jpeg" alt="" />
+                        <img class="cell-image" :src="book.book_image" alt="" />
                     </td>
-                    <td>Truyện kiều</td>
-                    <td>Nguyễn Du</td>
-                    <td>Văn học</td>
-                    <td>10</td>
-                    <td>1820</td>
+                    <td>{{ book.book_name }}</td>
+                    <td>{{ book.book_authors }}</td>
+                    <td>{{ book.book_topic }}</td>
+                    <td>{{ book.book_quantity }}</td>
+                    <td>{{ book.book_released_year }}</td>
                     <td>
-                        <button class="btn btn-primary" @click="redirectToBookDetail(10)">
+                        <button class="btn btn-primary" @click="redirectToBookDetail(book._id)">
                             <FontAwesomeIcon :icon="faEye" />
                             <span class="ms-2">Chi tiết</span>
                         </button>
-                        <button class="btn btn-warning ms-3">
-                            <FontAwesomeIcon :icon="faPen" />
-                            <span class="ms-2">Hiệu chỉnh</span>
-                        </button>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>
-                        <img class="cell-image" src="@/assets/images/truyen_kieu_1.jpeg" alt="" />
-                    </td>
-                    <td>Truyện kiều</td>
-                    <td>Nguyễn Du</td>
-                    <td>Văn học</td>
-                    <td>10</td>
-                    <td>1820</td>
-                    <td>
-                        <button class="btn btn-primary" @click="redirectToBookDetail(20)">
-                            <FontAwesomeIcon :icon="faEye" />
-                            <span class="ms-2">Chi tiết</span>
-                        </button>
-                        <button class="btn btn-warning ms-3">
-                            <FontAwesomeIcon :icon="faPen" />
-                            <span class="ms-2">Hiệu chỉnh</span>
-                        </button>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>
-                        <img class="cell-image" src="@/assets/images/truyen_kieu_1.jpeg" alt="" />
-                    </td>
-                    <td>Truyện kiều</td>
-                    <td>Nguyễn Du</td>
-                    <td>Văn học</td>
-                    <td>10</td>
-                    <td>1820</td>
-                    <td>
-                        <button class="btn btn-primary" @click="redirectToBookDetail(30)">
-                            <FontAwesomeIcon :icon="faEye" />
-                            <span class="ms-2">Chi tiết</span>
-                        </button>
-                        <button class="btn btn-warning ms-3">
+                        <button class="btn btn-warning ms-3" @click="redirectToBookModify(book._id)">
                             <FontAwesomeIcon :icon="faPen" />
                             <span class="ms-2">Hiệu chỉnh</span>
                         </button>
@@ -190,6 +237,7 @@ td:last-child {
     font-size: 1.6rem;
 }
 #select-topic,
+#select-released-year,
 .label,
 .select-item {
     font-size: 1.6rem;

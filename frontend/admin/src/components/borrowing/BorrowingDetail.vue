@@ -1,6 +1,6 @@
 <script setup>
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faEye, faPen, faSearch, faAngleLeft, faAngleRight, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faCheck } from '@fortawesome/free-solid-svg-icons';
 </script>
 
 <template>
@@ -11,16 +11,6 @@ import { faEye, faPen, faSearch, faAngleLeft, faAngleRight, faChevronLeft } from
                 <FontAwesomeIcon :icon="faChevronLeft" />
                 <span class="ms-2">Quay lại</span>
             </RouterLink>
-            <div>
-                <button class="btn btn-warning">
-                    <FontAwesomeIcon :icon="faPen" />
-                    <span class="ms-2">Hiệu chỉnh</span>
-                </button>
-                <button class="btn btn-danger ms-3">
-                    <FontAwesomeIcon :icon="faTrash" />
-                    <span class="ms-2">Xóa</span>
-                </button>
-            </div>
         </div>
         <!-- info -->
         <div class="row p-2">
@@ -32,7 +22,7 @@ import { faEye, faPen, faSearch, faAngleLeft, faAngleRight, faChevronLeft } from
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <div class="col-sm-3 py-2 px-3">Tên sách:</div>
+                    <div class="col-sm-3 py-2 px-3">Tên sách mượn:</div>
                     <div class="col-sm-9 d-flex align-items-center">
                         <p class="text">Truyện kiều</p>
                     </div>
@@ -73,6 +63,16 @@ import { faEye, faPen, faSearch, faAngleLeft, faAngleRight, faChevronLeft } from
                     <div class="col-sm-9 d-flex align-items-center">
                         <p class="text">Văn học</p>
                     </div>
+                </div>
+                <div class="d-flex justify-content-center mt-2">
+                    <button class="btn btn-success">
+                        <FontAwesomeIcon :icon="faCheck" />
+                        <span class="ms-2">Duyệt đơn mượn</span>
+                    </button>
+                    <button class="btn btn-danger ms-3">
+                        <FontAwesomeIcon :icon="faTrash" />
+                        <span class="ms-2">Xóa</span>
+                    </button>
                 </div>
             </div>
             <div class="col col-md-6">

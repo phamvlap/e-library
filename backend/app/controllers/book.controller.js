@@ -14,6 +14,7 @@ class BookController {
             const filter = {
                 book_name: req.query.book_name,
                 book_released_year: req.query.book_released_year,
+                book_topic: req.query.book_topic,
             };
             const books = await bookService.find(filter);
             return res.status(StatusCodes.OK).json({
@@ -30,6 +31,17 @@ class BookController {
             return res.status(StatusCodes.OK).json({
                 status: 'success',
                 data: book,
+            });
+        } catch (err) {
+            next(new BadRequestError(err.message));
+        }
+    }
+    async getReleasedYears(req, res, next) {
+        try {
+            const years = await bookService.findRealeasedYears();
+            return res.status(StatusCodes.OK).json({
+                status: 'success',
+                data: years,
             });
         } catch (err) {
             next(new BadRequestError(err.message));

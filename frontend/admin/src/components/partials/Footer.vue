@@ -2,7 +2,10 @@
 
 <template>
     <div class="wrapper">
-        <h1>Footer</h1>
+        <p class="p-3 text-center">
+            <span> &copy; 2024 by </span>
+            <RouterLink to="/admin"><strong>Library Management System</strong></RouterLink>
+        </p>
     </div>
 </template>
 

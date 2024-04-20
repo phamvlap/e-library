@@ -37,7 +37,7 @@ const fileFilter = (req, file, callback) => {
 };
 
 const limits = {
-    fileSize: 1024 * 1024, // 1MB
+    fileSize: 1024 * 1024 * 1024, // 1MB
     files: 10,
 };
 

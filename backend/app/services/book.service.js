@@ -1,3 +1,4 @@
+import fs from 'fs';
 import { unlink } from 'fs/promises';
 import mongoose from 'mongoose';
 import Book from './../models/book.model.js';
@@ -30,7 +31,12 @@ class BookService {
             };
         }
         if (filter.book_released_year) {
-            conditions.book_released_year = filter.book_released_year;
+            conditions.book_released_year = Number(filter.book_released_year);
+        }
+        if (filter.book_topic) {
+            conditions.topic_id = mongoose.isValidObjectId(filter.book_topic)
+                ? new mongoose.Types.ObjectId(filter.book_topic)
+                : null;
         }
         const books = await Book.aggregate([
             {
@@ -86,10 +92,14 @@ class BookService {
             });
         return book;
     }
+    async findRealeasedYears() {
+        const years = await Book.find({}).select('book_released_year').distinct('book_released_year');
+        return years;
+    }
     async create(payload) {
         const imageService = new ImageService();
         const data = this.extractBookData(payload);
-        if (payload.images && payload.book_images.length === 0) {
+        if (payload.book_images && payload.book_images.length === 0) {
             throw new BadRequestError('Book images are required');
         }
         const book = await Book.create(data);
@@ -107,7 +117,7 @@ class BookService {
     async update(_id, payload) {
         const imageService = new ImageService();
         const filter = {
-            _id: mongoose.isValidObjectId(_id) ? new mongoose.Types.ObjectId(_id) : null,
+            _id:  new mongoose.Types.ObjectId(_id),
         };
         const data = this.extractBookData(payload);
         const book = await Book.findOneAndUpdate(
@@ -122,20 +132,22 @@ class BookService {
             },
         );
         if (payload.book_images?.length > 0) {
-            const oldImages = await Image.find({
+            const oldImages = await imageService.find({
                 image_owner: book._id,
             });
             if (oldImages.length > 0) {
-                for (const image in oldImages) {
-                    await imageService.delete(image._id);
-                }
                 oldImages.forEach(async (image) => {
-                    try {
-                        await unlink(image.image_url);
-                    } catch (err) {
-                        throw new BadRequestError(err.message);
+                    if(fs.existsSync(image.image_url)) {
+                        try {
+                            await unlink(image.image_url);
+                        } catch (err) {
+                            throw new BadRequestError(err.message);
+                        }
                     }
                 });
+                for (const image of oldImages) {
+                    await imageService.delete(image._id);
+                }
             }
             const images = payload.book_images.map((image) => {
                 return {
@@ -143,13 +155,31 @@ class BookService {
                     image_owner: book._id,
                 };
             });
-            for (const image in images) {
+            for (const image of images) {
                 await imageService.create(image);
             }
         }
         return book;
     }
     async delete(_id) {
+        const imageService = new ImageService();
+        const oldImages = await imageService.find({
+            image_owner: _id,
+        });
+        if (oldImages.length > 0) {
+            for (const image in oldImages) {
+                await imageService.delete(image._id);
+            }
+            oldImages.forEach(async (image) => {
+                if(fs.existsSync(image.image_url)) {
+                    try {
+                        await unlink(image.image_url);
+                    } catch (err) {
+                        throw new BadRequestError(err.message);
+                    }
+                }
+            });
+        }
         const filter = {
             _id: mongoose.isValidObjectId(_id) ? new mongoose.Types.ObjectId(_id) : null,
         };

@@ -1,23 +1,6 @@
 <script setup>
-import { useRouter } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faEye, faTrash, faSearch, faAngleLeft, faAngleRight, faPlus } from '@fortawesome/free-solid-svg-icons';
-
-const router = useRouter();
-const redirecToBookAdd = () => {
-    router.push({
-        name: 'book.add',
-    });
-};
-
-const redirectToBookDetail = (id) => {
-    router.push({
-        name: 'book.detail',
-        params: {
-            id,
-        },
-    });
-};
+import { faTrash, faSearch, faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 </script>
 
 <template>
@@ -28,18 +11,7 @@ const redirectToBookDetail = (id) => {
             <div class="d-flex">
                 <div class="d-flex align-items-center justify-content-center">
                     <div class="input-group m-0">
-                        <label class="input-group-text label" for="select-topic">Chủ đề</label>
-                        <select class="form-select" id="select-topic">
-                            <option class="select-item" selected>-- Chọn --</option>
-                            <option class="select-item" value="1">One</option>
-                            <option class="select-item" value="2">Two</option>
-                            <option class="select-item" value="3">Three</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center ms-2">
-                    <div class="input-group m-0">
-                        <label class="input-group-text label" for="select-topic">Năm phát hành</label>
+                        <label class="input-group-text label" for="select-topic">Vai trò</label>
                         <select class="form-select" id="select-topic">
                             <option class="select-item" selected>-- Chọn --</option>
                             <option class="select-item" value="1">One</option>
@@ -56,7 +28,7 @@ const redirectToBookDetail = (id) => {
                     <input
                         type="text"
                         class="form-control"
-                        placeholder="Nhập tên độc giả cần tìm"
+                        placeholder="Nhập tên nhân viên cần tìm"
                         aria-describedby="search-book"
                     />
                     <button class="btn btn-outline-secondary" type="button" id="search-book">

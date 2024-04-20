@@ -3,6 +3,7 @@ import BookController from './../controllers/book.controller.js';
 
 const router = express.Router();
 
+router.get('/years', BookController.getReleasedYears);
 router.get('/:id', BookController.getById);
 router.get('/', BookController.get);
 router.post('/', BookController.create);

@@ -19,6 +19,10 @@ class BookService {
         return (await this.api.get(`/${id}`)).data;
     }
 
+    async getReleasedYears() {
+        return (await this.api.get('/years')).data;
+    }
+
     async createBook(data) {
         return (await this.api.post('/', data)).data;
     }

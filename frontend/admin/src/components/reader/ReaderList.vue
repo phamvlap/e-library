@@ -1,23 +1,6 @@
 <script setup>
-import { useRouter } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faEye, faTrash, faSearch, faAngleLeft, faAngleRight, faPlus } from '@fortawesome/free-solid-svg-icons';
-
-const router = useRouter();
-const redirecToBookAdd = () => {
-    router.push({
-        name: 'book.add',
-    });
-};
-
-const redirectToBookDetail = (id) => {
-    router.push({
-        name: 'book.detail',
-        params: {
-            id,
-        },
-    });
-};
+import { faTrash, faSearch, faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 </script>
 
 <template>
@@ -25,31 +8,7 @@ const redirectToBookDetail = (id) => {
         <h1 class="p-2 text-center">Danh sách độc giả</h1>
         <div class="p-2 d-flex border justify-content-between align-items-center">
             <!-- filter -->
-            <div class="d-flex">
-                <div class="d-flex align-items-center justify-content-center">
-                    <div class="input-group m-0">
-                        <label class="input-group-text label" for="select-topic">Chủ đề</label>
-                        <select class="form-select" id="select-topic">
-                            <option class="select-item" selected>-- Chọn --</option>
-                            <option class="select-item" value="1">One</option>
-                            <option class="select-item" value="2">Two</option>
-                            <option class="select-item" value="3">Three</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center ms-2">
-                    <div class="input-group m-0">
-                        <label class="input-group-text label" for="select-topic">Năm phát hành</label>
-                        <select class="form-select" id="select-topic">
-                            <option class="select-item" selected>-- Chọn --</option>
-                            <option class="select-item" value="1">One</option>
-                            <option class="select-item" value="2">Two</option>
-                            <option class="select-item" value="3">Three</option>
-                        </select>
-                    </div>
-                </div>
-                <button class="btn btn-primary ms-3">Áp dụng</button>
-            </div>
+            <div class="d-flex"></div>
             <!-- search -->
             <div>
                 <div class="input-group">

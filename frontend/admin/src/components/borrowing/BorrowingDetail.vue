@@ -203,7 +203,7 @@ onMounted(async () => {
                 <div class="mb-3 row">
                     <div class="col-sm-3 py-2 px-3">Trạng thái hiện tại:</div>
                     <div class="col-sm-9 d-flex align-items-center">
-                        <p class="text">{{ BorrowingStatus.retreiveStatus(detail.current_status) }}</p>
+                        <p class="text">{{ BorrowingStatus.retrieveStatus(detail.current_status) }}</p>
                     </div>
                 </div>
                 <div class="mb-3 row">
@@ -240,7 +240,7 @@ onMounted(async () => {
                     <div class="my-3 row" v-for="(item, index) in statusList" :key="index">
                         <div class="col-sm-1 py-2 px-3">{{ index + 1 }}</div>
                         <div class="col-sm-2 py-2 px-3">{{ Helper.formatDateTime(item.updatedAt) }}</div>
-                        <div class="col-sm-3 py-2 px-3">{{ BorrowingStatus.retreiveStatus(item.status) }}</div>
+                        <div class="col-sm-3 py-2 px-3">{{ BorrowingStatus.retrieveStatus(item.status) }}</div>
                         <div class="col-sm-3 py-2 px-3">{{ item.updatedBy.name }}</div>
                         <div class="col-sm-3 py-2 px-3">
                             {{ item.updatedBy.id.startsWith('S') ? 'Nhân viên' : 'Độc giả' }}
@@ -266,7 +266,7 @@ onMounted(async () => {
                                                 statusList.map((status) => status.status).includes('PENDING'))
                                         "
                                     >
-                                        {{ BorrowingStatus.retreiveUpdatedStatus(item) }}
+                                        {{ BorrowingStatus.retrieveUpdatedStatus(item) }}
                                     </option>
                                 </select>
                             </div>

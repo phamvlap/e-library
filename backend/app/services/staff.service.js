@@ -5,13 +5,14 @@ import AccountService from './account.service.js';
 class StaffService {
     extractStaffData(payload) {
         const staff = {
-            staff_id: payload.staff_id,
             staff_name: payload.staff_name,
             staff_role: payload.staff_role,
             staff_address: payload.staff_address,
             staff_phone: payload.staff_phone,
         };
-        return Helper.extractData(staff);
+        const data = Helper.extractData(staff);
+        data.staff_role = data.staff_role.toUpperCase();
+        return data;
     }
     async find(filter) {
         let conditions = {};
@@ -22,7 +23,7 @@ class StaffService {
             };
         }
         if (filter.staff_role) {
-            conditions.staff_name = filter.staff_role;
+            conditions.staff_role = filter.staff_role;
         }
         const staffs = await Staff.find(conditions);
         return staffs;
@@ -46,12 +47,18 @@ class StaffService {
         } else {
             data.staff_id = 'S1001';
         }
-        const staff = await Staff.create(data);
-        const account = await accountService.create({
+        const accountData = {
             account_id: data.staff_id,
-            account_password: payload.staff_password,
-        });
-        return staff;
+            account_password: Helper.generateRandomString(8),
+        };
+        const staff = await Staff.create(data);
+        const account = await accountService.create(accountData);
+        return {
+            staff,
+            account: {
+                ...accountData,
+            },
+        };
     }
     async update(staffId, payload) {
         const filter = {

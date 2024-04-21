@@ -15,13 +15,13 @@ class BorrowingStatus {
     static getKeys() {
         return Object.keys(this.viewStatus);
     }
-    static retreiveStatus(status) {
+    static retrieveStatus(status) {
         return this.viewStatus[status];
     }
     static getUpdatedKeys() {
         return Object.keys(this.updatedStatus);
     }
-    static retreiveUpdatedStatus(status) {
+    static retrieveUpdatedStatus(status) {
         return this.updatedStatus[status];
     }
 }

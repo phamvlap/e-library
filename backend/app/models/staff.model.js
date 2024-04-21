@@ -15,7 +15,7 @@ const StaffSchema = mongoose.Schema(
         staff_role: {
             type: String,
             enum: {
-                values: ['admin', 'staff', 'manager'], // enum validator
+                values: ['ADMIN', 'STAFF', 'MANAGER'], // enum validator
                 message: '{VALUE} is not supported', // error message
             },
             required: [true, 'Please provide a staff role'],

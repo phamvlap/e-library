@@ -145,7 +145,7 @@ onMounted(async () => {
                         <select class="form-select" id="select-status" v-model="filter.status">
                             <option class="select-item" selected value="">-- Chọn --</option>
                             <option class="select-item" v-for="(item, index) in status" :key="index" :value="item">
-                                {{ BorrowingStatus.retreiveStatus(item) }}
+                                {{ BorrowingStatus.retrieveStatus(item) }}
                             </option>
                         </select>
                     </div>
@@ -202,7 +202,7 @@ onMounted(async () => {
                     <td>{{ detail.book_name }}</td>
                     <td>{{ Helper.formatDateTime(detail.borrowed_date) }}</td>
                     <td>{{ detail.borrowing_quantity }}</td>
-                    <td>{{ BorrowingStatus.retreiveStatus(detail.status) }}</td>
+                    <td>{{ BorrowingStatus.retrieveStatus(detail.status) }}</td>
                     <td>
                         <button
                             class="btn btn-primary"

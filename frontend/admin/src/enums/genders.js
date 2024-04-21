@@ -7,7 +7,7 @@ class Gender {
     static getKeys() {
         return Object.keys(this.genders);
     }
-    static retreiveGender(key) {
+    static retrieveGender(key) {
         return this.genders[key];
     }
 }

@@ -38,7 +38,6 @@ class StaffController {
                 staff_role: req.body.staff_role,
                 staff_address: req.body.staff_address,
                 staff_phone: req.body.staff_phone,
-                staff_password: req.body.staff_password,
             };
             const staff = await staffService.create(payload);
             return res.status(StatusCodes.CREATED).json({

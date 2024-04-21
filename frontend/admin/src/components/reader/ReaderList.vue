@@ -13,6 +13,7 @@ import ReaderService from '@/services/reader.service.js';
 import Helper from '@/utils/helper.js';
 import Gender from '@/enums/genders.js';
 import { toast } from 'vue3-toastify';
+import Swal from 'sweetalert2';
 
 const readers = ref([]);
 let filter = ref({
@@ -57,6 +58,34 @@ const handleSortName = async () => {
         filter.value.sort_name = -1;
     }
     await fetchReaders(filter.value);
+};
+const handleDelete = async (readerId) => {
+    const confirm = await Swal.fire({
+        title: 'Xác nhận xóa',
+        text: 'Bạn có chắc chắn muốn xóa độc giả này không?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Xóa',
+        cancelButtonText: 'Hủy',
+    });
+    if (confirm.isConfirmed) {
+        try {
+            const readerService = new ReaderService();
+            const response = await readerService.deleteReader(readerId);
+            if (response.status === 'success') {
+                toast.success('Xóa độc giả thành công', {
+                    duration: 1000,
+                });
+                await fetchReaders();
+            }
+        } catch (error) {
+            toast.error('Xóa độc giả thất bại', {
+                duration: 1000,
+            });
+        }
+    }
 };
 
 onMounted(async () => {
@@ -115,11 +144,11 @@ onMounted(async () => {
                     <td>{{ reader.reader_first_name }}</td>
                     <td>{{ reader.reader_last_name }}</td>
                     <td>{{ Helper.formatDateTime(reader.reader_dob) }}</td>
-                    <td>{{ Gender.retreiveGender(reader.reader_gender) }}</td>
+                    <td>{{ Gender.retrieveGender(reader.reader_gender) }}</td>
                     <td>{{ reader.reader_address }}</td>
                     <td>{{ reader.reader_phone }}</td>
                     <td>
-                        <button class="btn btn-warning ms-3">
+                        <button class="btn btn-warning ms-3" @click="handleDelete(reader.reader_id)">
                             <FontAwesomeIcon :icon="faTrash" />
                             <span class="ms-2">Xóa</span>
                         </button>

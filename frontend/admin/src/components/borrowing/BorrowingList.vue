@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faEye, faPen, faSearch, faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faPen, faSearch, faAngleLeft, faAngleRight, faRotate } from '@fortawesome/free-solid-svg-icons';
 import BorrowingStatus from '@/enums/borrowingStatus.js';
 import BorrowingDetailService from '@/services/borrowingDetail.service.js';
 import Helper from '@/utils/helper.js';
@@ -127,6 +127,15 @@ const handleFilter = async () => {
     }
     await fetchBorrowingDetail(filter.value);
 };
+const handleRefresh = async () => {
+    filter.value = {
+        status: '',
+        start_date: '',
+        end_date: '',
+        book_name: '',
+    };
+    await fetchBorrowingDetail();
+};
 
 onMounted(async () => {
     await fetchBorrowingDetail();
@@ -165,6 +174,13 @@ onMounted(async () => {
                     </div>
                 </div>
                 <button class="btn btn-primary ms-3" @click="handleFilter">Áp dụng</button>
+            </div>
+            <div class="d-flex">
+                <div class="ms-4">
+                    <button class="btn btn-secondary" type="button" id="search-book" @click="handleRefresh">
+                        <FontAwesomeIcon :icon="faRotate" />
+                    </button>
+                </div>
             </div>
             <!-- search -->
             <!-- <div>

@@ -8,6 +8,7 @@ import {
     faAngleRight,
     faArrowDownAZ,
     faArrowDownZA,
+    faRotate,
 } from '@fortawesome/free-solid-svg-icons';
 import ReaderService from '@/services/reader.service.js';
 import Helper from '@/utils/helper.js';
@@ -87,6 +88,13 @@ const handleDelete = async (readerId) => {
         }
     }
 };
+const handleRefresh = async () => {
+    filter.value = {
+        reader_name: '',
+        sort_name: 0,
+    };
+    await fetchReaders();
+};
 
 onMounted(async () => {
     await fetchReaders();
@@ -100,7 +108,7 @@ onMounted(async () => {
             <!-- filter -->
             <div class="d-flex"></div>
             <!-- search -->
-            <div>
+            <div class="d-flex">
                 <form class="input-group" @submit="submitSearchForm">
                     <input
                         type="text"
@@ -109,10 +117,15 @@ onMounted(async () => {
                         aria-describedby="search-book"
                         v-model="filter.reader_name"
                     />
-                    <button class="btn btn-outline-secondary" type="button" id="search-book">
+                    <button class="btn btn-outline-secondary" type="submit" id="search-book">
                         <FontAwesomeIcon :icon="faSearch" />
                     </button>
                 </form>
+                <div class="ms-4">
+                    <button class="btn btn-secondary" type="button" id="search-book" @click="handleRefresh">
+                        <FontAwesomeIcon :icon="faRotate" />
+                    </button>
+                </div>
             </div>
         </div>
         <!-- table -->

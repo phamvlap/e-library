@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faEye, faPen, faSearch, faAngleLeft, faAngleRight, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faPen, faSearch, faAngleLeft, faAngleRight, faPlus, faRotate } from '@fortawesome/free-solid-svg-icons';
 import BookService from '@/services/book.service.js';
 import TopicService from '@/services/topic.service.js';
 import Helper from '@/utils/helper.js';
@@ -96,9 +96,19 @@ const handleFilter = async () => {
     filter.value.name = '';
     await getBooks(filter);
 };
-const handleSearch = async () => {
+const submitSearchForm = async (event) => {
+    event.preventDefault();
+
     filter.value.topic = '';
     filter.value.released_year = '';
+    await getBooks(filter);
+};
+const handleRefresh = async () => {
+    filter.value = {
+        topic: '',
+        released_year: '',
+        name: '',
+    };
     await getBooks(filter);
 };
 onMounted(async () => {
@@ -145,8 +155,8 @@ onMounted(async () => {
                 <button class="btn btn-primary ms-3" @click="handleFilter">Áp dụng</button>
             </div>
             <!-- search -->
-            <div>
-                <div class="input-group">
+            <div class="d-flex">
+                <form class="input-group" @submit="submitSearchForm">
                     <input
                         type="text"
                         class="form-control"
@@ -154,8 +164,13 @@ onMounted(async () => {
                         aria-describedby="search-book"
                         v-model="filter.name"
                     />
-                    <button class="btn btn-outline-secondary" type="button" id="search-book" @click="handleSearch">
+                    <button class="btn btn-outline-secondary" type="button" id="search-book">
                         <FontAwesomeIcon :icon="faSearch" />
+                    </button>
+                </form>
+                <div class="ms-4">
+                    <button class="btn btn-secondary" type="button" id="search-book" @click="handleRefresh">
+                        <FontAwesomeIcon :icon="faRotate" />
                     </button>
                 </div>
             </div>

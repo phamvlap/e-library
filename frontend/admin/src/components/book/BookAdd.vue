@@ -15,6 +15,7 @@ const router = useRouter();
 const route = useRoute();
 const bookId = route.params.id;
 const isUpdating = !!bookId;
+let isMounted = ref(false);
 
 let book = ref({
     book_name: '',
@@ -92,6 +93,7 @@ onMounted(async () => {
     if (bookId) {
         await getOneBook(bookId);
     }
+    isMounted.value = true;
 });
 </script>
 
@@ -108,7 +110,7 @@ onMounted(async () => {
         </div>
         <!-- form -->
         <div class="p-2">
-            <BookForm :book="book" :isUpdating="isUpdating" @submit:book="submitBook" />
+            <BookForm v-if="isMounted" :book="book" :isUpdating="isUpdating" @submit:book="submitBook" />
         </div>
     </div>
 </template>

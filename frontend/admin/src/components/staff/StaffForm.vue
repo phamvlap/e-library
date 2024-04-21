@@ -44,12 +44,16 @@ const staffSchema = yup.object().shape({
         .required('Số điện thoại không được để trống')
         .min(10, 'Số điện thoại phải bao gồm 10 ký tự'),
 });
-const validateRole = () => {
+// const validateRole = () => {
+//     if (localStaff.value.staff_role === '') {
+//         errors.value.staff_role = 'Vai trò không được để trống';
+//     }
+// };
+const submitStaff = () => {
     if (localStaff.value.staff_role === '') {
         errors.value.staff_role = 'Vai trò không được để trống';
+        return;
     }
-};
-const submitStaff = () => {
     $emits('submit:staff', localStaff.value);
 };
 const handleCancel = () => {

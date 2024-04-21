@@ -1,6 +1,67 @@
 <script setup>
+import { ref, onMounted } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faTrash, faSearch, faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
+import {
+    faTrash,
+    faSearch,
+    faAngleLeft,
+    faAngleRight,
+    faArrowDownAZ,
+    faArrowDownZA,
+} from '@fortawesome/free-solid-svg-icons';
+import ReaderService from '@/services/reader.service.js';
+import Helper from '@/utils/helper.js';
+import Gender from '@/enums/genders.js';
+import { toast } from 'vue3-toastify';
+
+const readers = ref([]);
+let filter = ref({
+    reader_name: '',
+    sort_name: 0,
+});
+
+const fetchReaders = async (filter = {}) => {
+    try {
+        const readerService = new ReaderService();
+        const customFilter = {};
+        if (filter.reader_name) {
+            customFilter.reader_first_name = filter.reader_name;
+            customFilter.reader_last_name = filter.reader_name;
+        }
+        if (filter.sort_name) {
+            customFilter.sort_name = filter.sort_name;
+        }
+        const response = await readerService.getReaders(customFilter);
+        if (response.status === 'success') {
+            readers.value = response.data;
+        }
+    } catch (error) {
+        readers.value = [];
+    }
+};
+const submitSearchForm = async (event) => {
+    event.preventDefault();
+
+    if (filter.value.reader_name === '') {
+        toast.error('Vui lòng nhập tên độc giả cần tìm', {
+            duration: 1000,
+        });
+        return;
+    }
+    await fetchReaders(filter.value);
+};
+const handleSortName = async () => {
+    if (filter.value.sort_name === 0 || filter.value.sort_name === -1) {
+        filter.value.sort_name = 1;
+    } else if (filter.value.sort_name === 1) {
+        filter.value.sort_name = -1;
+    }
+    await fetchReaders(filter.value);
+};
+
+onMounted(async () => {
+    await fetchReaders();
+});
 </script>
 
 <template>
@@ -11,17 +72,18 @@ import { faTrash, faSearch, faAngleLeft, faAngleRight } from '@fortawesome/free-
             <div class="d-flex"></div>
             <!-- search -->
             <div>
-                <div class="input-group">
+                <form class="input-group" @submit="submitSearchForm">
                     <input
                         type="text"
                         class="form-control"
                         placeholder="Nhập tên độc giả cần tìm"
                         aria-describedby="search-book"
+                        v-model="filter.reader_name"
                     />
                     <button class="btn btn-outline-secondary" type="button" id="search-book">
                         <FontAwesomeIcon :icon="faSearch" />
                     </button>
-                </div>
+                </form>
             </div>
         </div>
         <!-- table -->
@@ -31,7 +93,14 @@ import { faTrash, faSearch, faAngleLeft, faAngleRight } from '@fortawesome/free-
                     <th scope="col">#</th>
                     <th scope="col">Mã độc giả</th>
                     <th scope="col">Họ</th>
-                    <th scope="col">Tên</th>
+                    <th scope="col d-flex align-items-center">
+                        <span>Tên</span>
+                        <FontAwesomeIcon
+                            :icon="filter.sort_name === 1 ? faArrowDownZA : faArrowDownAZ"
+                            class="p-1 ms-3 sort-icon"
+                            @click="handleSortName"
+                        />
+                    </th>
                     <th scope="col">Ngày sinh</th>
                     <th scope="col">Giới tính</th>
                     <th scope="col">Địa chỉ</th>
@@ -40,15 +109,15 @@ import { faTrash, faSearch, faAngleLeft, faAngleRight } from '@fortawesome/free-
                 </tr>
             </thead>
             <tbody>
-                <tr>
+                <tr v-for="reader in readers" :key="reader._id">
                     <th scope="row">1</th>
-                    <td>R1001</td>
-                    <td>Nguyen</td>
-                    <td>An</td>
-                    <td>01-01-2002</td>
-                    <td>Nam</td>
-                    <td>Can Tho</td>
-                    <td>C03333385950</td>
+                    <td>{{ reader.reader_id }}</td>
+                    <td>{{ reader.reader_first_name }}</td>
+                    <td>{{ reader.reader_last_name }}</td>
+                    <td>{{ Helper.formatDateTime(reader.reader_dob) }}</td>
+                    <td>{{ Gender.retreiveGender(reader.reader_gender) }}</td>
+                    <td>{{ reader.reader_address }}</td>
+                    <td>{{ reader.reader_phone }}</td>
                     <td>
                         <button class="btn btn-warning ms-3">
                             <FontAwesomeIcon :icon="faTrash" />
@@ -107,5 +176,8 @@ td:last-child {
 }
 .custom-pagination__icon {
     font-size: 1.4rem;
+}
+.sort-icon:hover {
+    cursor: pointer;
 }
 </style>

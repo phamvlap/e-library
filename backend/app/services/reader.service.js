@@ -13,23 +13,43 @@ class ReaderService {
             reader_address: payload.reader_address,
             reader_phone: payload.reader_phone,
         };
-        return Helper.extractData(reader);
+        let data = Helper.extractData(reader);
+        data.reader_gender = data.reader_gender.toUpperCase();
+        return data;
     }
     async find(filter) {
         let conditions = {};
+        let options = [];
+
         if (filter.reader_first_name) {
-            conditions.reader_first_name = {
-                $regex: filter.reader_first_name,
-                $options: 'i',
-            };
+            options.push({
+                reader_first_name: {
+                    $regex: filter.reader_first_name,
+                    $options: 'i',
+                }
+            });
         }
         if (filter.reader_last_name) {
-            conditions.reader_last_name = {
-                $regex: filter.reader_last_name,
-                $options: 'i',
-            };
+            options.push({
+                reader_last_name: {
+                    $regex: filter.reader_last_name,
+                    $options: 'i',
+                }
+            });
         }
-        const readers = await Reader.find(conditions);
+        if(options.length > 0) {
+            conditions = {
+                ...conditions,
+                $or: options
+            }
+        }
+        let query = Reader.find(conditions);
+        if (filter.sort_name) {
+            query = query.sort({
+                reader_first_name: Number(filter.sort_name),
+            });
+        }
+        const readers = await query;
         return readers;
     }
     async findById(readerId) {

@@ -10,6 +10,7 @@ class ReaderController {
             const filter = {
                 reader_first_name: req.query.reader_first_name,
                 reader_last_name: req.query.reader_last_name,
+                sort_name: req.query.sort_name,
             };
             const readers = await readerService.find(filter);
             return res.status(StatusCodes.OK).json({

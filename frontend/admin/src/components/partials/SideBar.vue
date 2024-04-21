@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue';
+import { onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';

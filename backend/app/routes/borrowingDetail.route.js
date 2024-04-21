@@ -6,6 +6,6 @@ const router = express.Router();
 router.get('/', BorrowingDetailController.get);
 router.post('/', BorrowingDetailController.create);
 router.patch('/:id', BorrowingDetailController.update);
-router.delete('/:id', BorrowingDetailController.delete);
+router.delete('/', BorrowingDetailController.delete);
 
 export default router;

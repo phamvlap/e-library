@@ -15,7 +15,9 @@ class BorrowingDetailService {
             status: payload.status,
             status_updated_by: payload.status_updated_by,
         };
-        return Helper.extractData(borrowingDetail);
+        let data = Helper.extractData(borrowingDetail);
+        data.status = data.status.toUpperCase();
+        return data;
     }
     async find(filter) {
         const bookService = new BookService();
@@ -35,7 +37,20 @@ class BorrowingDetailService {
         if (filter.status) {
             conditions.status = filter.status;
         }
-        const borrowingDetails = await BorrowingDetail.find(conditions);
+        if(filter.start_date) {
+            conditions.borrowed_date = {
+                $gte: filter.start_date,
+            };
+        }
+        if(filter.end_date) {
+            conditions.borrowed_date = {
+                ...conditions.borrowed_date,
+                $lte: filter.end_date,
+            };
+        }
+        const borrowingDetails = await BorrowingDetail.find(conditions).sort({
+            updatedAt: -1,
+        });
         let result = [];
         for (let borrowingDetail of borrowingDetails) {
             const book = await bookService.findById(borrowingDetail.book_id);
@@ -86,6 +101,7 @@ class BorrowingDetailService {
             book_id: bookId,
             borrowed_date: borrowedDate,
         };
+        console.log(filter)
         const borrowingDetail = await BorrowingDetail.findOneAndDelete(filter);
         return borrowingDetail;
     }

@@ -12,6 +12,8 @@ class BorrowingDetailController {
                 book_id: req.query.book_id,
                 borrowed_date: req.query.borrowed_date,
                 status: req.query.status,
+                start_date: req.query.start_date,
+                end_date: req.query.end_date,
             };
             const borrowingDetails = await borrowingDetailService.find(filter);
             return res.status(StatusCodes.OK).json({
@@ -62,12 +64,7 @@ class BorrowingDetailController {
     }
     async delete(req, res, next) {
         try {
-            const conditions = {
-                reader_id: req.body.reader_id,
-                book_id: req.body.book_id,
-                borrowed_date: req.body.borrowed_date,
-            };
-            const borrowingDetail = await borrowingDetailService.delete(conditions);
+            const borrowingDetail = await borrowingDetailService.delete(req.body.reader_id, req.body.book_id, req.body.borrowed_date);
             return res.status(StatusCodes.OK).json({
                 status: 'success',
                 data: borrowingDetail,

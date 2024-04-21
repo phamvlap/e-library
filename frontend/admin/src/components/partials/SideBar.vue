@@ -1,6 +1,8 @@
 <script setup>
+import { ref, onMounted, watch, computed } from 'vue';
+import { useRoute } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faUserCircle, faAngleDown } from '@fortawesome/free-solid-svg-icons';
+import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 
 const menuList = [
     {
@@ -24,6 +26,11 @@ const menuList = [
         path: '/admin/staffs',
     },
 ];
+const route = useRoute();
+const currentPath = computed(() => {
+    return route.path;
+});
+onMounted(() => {});
 </script>
 
 <template>
@@ -47,10 +54,21 @@ const menuList = [
             </div>
             <div class="p-2">
                 <ul>
-                    <li v-for="item in menuList">
-                        <RouterLink :to="item.path" class="d-inline-block w-100 p-3 menu-item">{{
-                            item.name
-                        }}</RouterLink>
+                    <li v-for="(item, index) in menuList">
+                        <RouterLink
+                            :to="item.path"
+                            :class="{
+                                'd-inline-block w-100 p-3 menu-item': true,
+                                'active-menu': (currentPath.split('/admin')[1].length > 0
+                                    ? currentPath.split('/admin')[1]
+                                    : currentPath
+                                ).includes(
+                                    item.path.split('/admin')[1].length > 0 ? item.path.split('/admin')[1] : item.path,
+                                ),
+                            }"
+                            @click="activeMenu = index"
+                            >{{ item.name }}</RouterLink
+                        >
                     </li>
                 </ul>
             </div>
@@ -85,6 +103,9 @@ const menuList = [
 .dropdown__item:hover,
 .menu-item:hover {
     cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+.active-menu {
     background-color: rgba(0, 0, 0, 0.1);
 }
 </style>

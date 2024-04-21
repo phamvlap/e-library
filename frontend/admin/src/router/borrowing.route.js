@@ -9,9 +9,10 @@ export default {
             component: () => import('@/components/borrowing/BorrowingList.vue'),
         },
         {
-            path: 'detail',
+            path: 'detail/:reader_id/:book_id/:borrowed_date',
             name: 'borrowing.detail',
             component: () => import('@/components/borrowing/BorrowingDetail.vue'),
+            props: true,
         },
     ],
 };

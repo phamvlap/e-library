@@ -26,10 +26,10 @@ const BorrowingDetailSchema = mongoose.Schema(
         status: {
             type: String,
             enum: {
-                values: ['pending', 'confirmed', 'borrowed', 'returned', 'cancelled'],
+                values: ['PENDING', 'CONFIRMED', 'BORROWED', 'RETURNED', 'CANCELED'],
                 messaege: '{VALUE} is not supported.',
             },
-            default: 'pending',
+            default: 'PENDING',
         },
         status_updated_by: {
             type: String,

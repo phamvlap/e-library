@@ -23,8 +23,16 @@ class BorrowingDetailService {
         return (await this.api.patch(`/${id}`, data)).data;
     }
 
-    async deleteBorrowingDetail(id) {
-        return (await this.api.delete(`/${id}`)).data;
+    async deleteBorrowingDetail(readerId, bookId, borrowedDate) {
+        return (
+            await this.api.delete('/', {
+                data: {
+                    reader_id: readerId,
+                    book_id: bookId,
+                    borrowed_date: borrowedDate,
+                },
+            })
+        ).data;
     }
 }
 

@@ -1,19 +1,136 @@
 <script setup>
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faEye, faPen, faSearch, faAngleLeft, faAngleRight } from '@fortawesome/free-solid-svg-icons';
+import BorrowingStatus from '@/enums/borrowingStatus.js';
+import BorrowingDetailService from '@/services/borrowingDetail.service.js';
+import Helper from '@/utils/helper.js';
+import { toast } from 'vue3-toastify';
 
 const router = useRouter();
-const goToBorrowingDetail = (reader_id, book_id, returned_date) => {
+const status = BorrowingStatus.getKeys();
+let filter = ref({
+    status: '',
+    start_date: '',
+    end_date: '',
+    book_name: '',
+});
+
+const goToBorrowingDetail = (reader_id, book_id, borrowed_date) => {
     router.push({
         name: 'borrowing.detail',
         params: {
             reader_id,
             book_id,
-            returned_date,
+            borrowed_date,
         },
     });
 };
+let borrowingDetails = ref([]);
+const fetchBorrowingDetail = async (filter = {}) => {
+    try {
+        const borrowingDetailService = new BorrowingDetailService();
+        const customFilter = {};
+        Object.keys(filter).forEach((key) => {
+            if (filter[key] !== '') {
+                customFilter[key] = filter[key];
+            }
+        });
+        const response = await borrowingDetailService.getBorrowingDetails(customFilter);
+        if (response.status === 'success') {
+            let result = [];
+            if (customFilter.status) {
+                for (const item of response.data) {
+                    const itemDetails = await borrowingDetailService.getBorrowingDetails({
+                        reader_id: item.borrowingDetail.reader_id,
+                        book_id: item.borrowingDetail.book_id,
+                        borrowed_date: item.borrowingDetail.borrowed_date,
+                    });
+                    if (item.borrowingDetail.status === itemDetails.data[0].borrowingDetail.status) {
+                        result.push({
+                            ...item,
+                        });
+                    }
+                }
+            } else {
+                result = response.data;
+            }
+
+            let data = [];
+
+            let detail = {};
+            for (const item of result) {
+                detail = {
+                    reader_id: item.borrowingDetail.reader_id,
+                    book_id: item.borrowingDetail.book_id,
+                    borrowed_date: item.borrowingDetail.borrowed_date,
+                };
+                let isExists = false;
+                for (const i of data) {
+                    if (
+                        i.reader_id === detail.reader_id &&
+                        i.book_id === detail.book_id &&
+                        i.borrowed_date === detail.borrowed_date
+                    ) {
+                        isExists = true;
+                        break;
+                    }
+                }
+                if (!isExists) {
+                    data.push({
+                        ...detail,
+                        reader_name: item.reader.reader_first_name + ' ' + item.reader.reader_last_name,
+                        book_name: item.book[0].book_name,
+                        borrowing_quantity: item.borrowingDetail.borrowing_quantity,
+                        status: item.borrowingDetail.status,
+                    });
+                }
+            }
+            borrowingDetails.value = data;
+        }
+    } catch (error) {
+        borrowingDetails.value = [];
+    }
+};
+const handleFilter = async () => {
+    if (filter.value.start_date) {
+        if (filter.value.start_date > new Date().toISOString().split('T')[0]) {
+            toast.error('Ngày bắt đầu không thể lớn hơn ngày hiện tại', {
+                onClose: () => {
+                    filter.value.start_date = '';
+                },
+            });
+            return;
+        }
+    }
+    if (filter.value.end_date) {
+        if (filter.value.end_date > new Date().toISOString().split('T')[0]) {
+            toast.error('Ngày kết thúc không thể lớn hơn ngày hiện tại', {
+                onClose: () => {
+                    filter.value.end_date = '';
+                },
+            });
+            return;
+        }
+    }
+    if (filter.value.start_date && filter.value.end_date) {
+        if (filter.value.start_date > filter.value.end_date) {
+            toast.error('Ngày bắt đầu không thể lớn hơn ngày kết thúc', {
+                onClose: () => {
+                    filter.value.start_date = '';
+                    filter.value.end_date = '';
+                },
+            });
+            return;
+        }
+    }
+    await fetchBorrowingDetail(filter.value);
+};
+
+onMounted(async () => {
+    await fetchBorrowingDetail();
+});
 </script>
 
 <template>
@@ -25,11 +142,11 @@ const goToBorrowingDetail = (reader_id, book_id, returned_date) => {
                 <div class="d-flex align-items-center justify-content-center">
                     <div class="input-group m-0">
                         <label class="input-group-text label" for="select-status">Trạng thái:</label>
-                        <select class="form-select" id="select-status">
-                            <option class="select-item" selected>-- Chọn --</option>
-                            <option class="select-item" value="1">One</option>
-                            <option class="select-item" value="2">Two</option>
-                            <option class="select-item" value="3">Three</option>
+                        <select class="form-select" id="select-status" v-model="filter.status">
+                            <option class="select-item" selected value="">-- Chọn --</option>
+                            <option class="select-item" v-for="(item, index) in status" :key="index" :value="item">
+                                {{ BorrowingStatus.retreiveStatus(item) }}
+                            </option>
                         </select>
                     </div>
                 </div>
@@ -37,32 +154,33 @@ const goToBorrowingDetail = (reader_id, book_id, returned_date) => {
                     <div class="input-group m-0">
                         <div class="input-group m-0">
                             <label class="input-group-text label">Ngày bắt đầu:</label>
-                            <input type="date" class="border p-2" />
+                            <input type="date" class="border p-2" v-model="filter.start_date" />
                         </div>
                     </div>
                 </div>
                 <div class="d-flex align-items-center ms-2">
                     <div class="input-group m-0">
                         <label class="input-group-text label">Ngày kết thúc:</label>
-                        <input type="date" class="border p-2" />
+                        <input type="date" class="border p-2" v-model="filter.end_date" />
                     </div>
                 </div>
-                <button class="btn btn-primary ms-3">Áp dụng</button>
+                <button class="btn btn-primary ms-3" @click="handleFilter">Áp dụng</button>
             </div>
             <!-- search -->
-            <div>
+            <!-- <div>
                 <div class="input-group">
                     <input
                         type="text"
                         class="form-control"
                         placeholder="Nhập tên sách cần tìm"
                         aria-describedby="search-book"
+                        v-model="filter.book_name"
                     />
                     <button class="btn btn-outline-secondary" type="button" id="search-book">
                         <FontAwesomeIcon :icon="faSearch" />
                     </button>
                 </div>
-            </div>
+            </div> -->
         </div>
         <!-- table -->
         <table class="table table-striped table-hover border mt-2">
@@ -73,62 +191,25 @@ const goToBorrowingDetail = (reader_id, book_id, returned_date) => {
                     <th scope="col">Tên sách</th>
                     <th scope="col">Ngày mượn</th>
                     <th scope="col">Số lượng</th>
-                    <th scope="col">Trạng thái</th>
+                    <th scope="col">Trạng thái hiện tại</th>
                     <th scope="col">Thao tác</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Nguyen Van A</td>
-                    <td>Truyện kiều</td>
-                    <td>10:10 18-04-2024</td>
-                    <td>10</td>
-                    <td>Đang chờ duyệt</td>
+                <tr v-for="(detail, index) in borrowingDetails" :key="index">
+                    <th scope="row">{{ index + 1 }}</th>
+                    <td>{{ detail.reader_name }}</td>
+                    <td>{{ detail.book_name }}</td>
+                    <td>{{ Helper.formatDateTime(detail.borrowed_date) }}</td>
+                    <td>{{ detail.borrowing_quantity }}</td>
+                    <td>{{ BorrowingStatus.retreiveStatus(detail.status) }}</td>
                     <td>
-                        <button class="btn btn-primary" @click="goToBorrowingDetail(1001, 1002, '10:10 18-04-2024<')">
+                        <button
+                            class="btn btn-primary"
+                            @click="goToBorrowingDetail(detail.reader_id, detail.book_id, detail.borrowed_date)"
+                        >
                             <FontAwesomeIcon :icon="faEye" />
                             <span class="ms-2">Chi tiết</span>
-                        </button>
-                        <button class="btn btn-warning ms-3">
-                            <FontAwesomeIcon :icon="faPen" />
-                            <span class="ms-2">Hiệu chỉnh</span>
-                        </button>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Nguyen Van A</td>
-                    <td>Truyện kiều</td>
-                    <td>10:10 18-04-2024</td>
-                    <td>10</td>
-                    <td>Đang chờ duyệt</td>
-                    <td>
-                        <button class="btn btn-primary" @click="goToBorrowingDetail(1001, 1002, '10:10 18-04-2024<')">
-                            <FontAwesomeIcon :icon="faEye" />
-                            <span class="ms-2">Chi tiết</span>
-                        </button>
-                        <button class="btn btn-warning ms-3">
-                            <FontAwesomeIcon :icon="faPen" />
-                            <span class="ms-2">Hiệu chỉnh</span>
-                        </button>
-                    </td>
-                </tr>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Nguyen Van A</td>
-                    <td>Truyện kiều</td>
-                    <td>10:10 18-04-2024</td>
-                    <td>10</td>
-                    <td>Đang chờ duyệt</td>
-                    <td>
-                        <button class="btn btn-primary" @click="goToBorrowingDetail(1001, 1002, '10:10 18-04-2024<')">
-                            <FontAwesomeIcon :icon="faEye" />
-                            <span class="ms-2">Chi tiết</span>
-                        </button>
-                        <button class="btn btn-warning ms-3">
-                            <FontAwesomeIcon :icon="faPen" />
-                            <span class="ms-2">Hiệu chỉnh</span>
                         </button>
                     </td>
                 </tr>
@@ -167,7 +248,7 @@ td {
 }
 th:last-child,
 td:last-child {
-    width: 280px;
+    width: 240px;
 }
 .select {
     font-size: 1.6rem;

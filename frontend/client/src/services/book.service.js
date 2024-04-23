@@ -15,6 +15,13 @@ class BookService {
         return (await this.api.get('/')).data;
     }
 
+    async getNewBooks(quantity) {
+        return await this.getBooks({
+            created_at_sort: -1,
+            limit: quantity,
+        });
+    }
+
     async getBook(id) {
         return (await this.api.get(`/${id}`)).data;
     }

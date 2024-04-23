@@ -15,6 +15,8 @@ class BookController {
                 book_name: req.query.book_name,
                 book_released_year: req.query.book_released_year,
                 book_topic: req.query.book_topic,
+                created_at_sort: req.query.created_at_sort,
+                limit: req.query.limit,
             };
             const books = await bookService.find(filter);
             return res.status(StatusCodes.OK).json({

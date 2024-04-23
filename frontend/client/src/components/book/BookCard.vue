@@ -1,5 +1,13 @@
 <script setup>
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+
+const props = defineProps({
+    book: Object,
+});
+const book = ref({
+    ...props.book,
+});
 
 const router = useRouter();
 
@@ -11,33 +19,30 @@ const goToBookDetail = (bookId) => {
         },
     });
 };
-
-const goToBorrowingOrder = () => {
+const goToBorrowingOrder = (bookId) => {
     router.push({
         name: 'user.borrowing-order',
+        params: {
+            id: bookId,
+        },
     });
 };
 </script>
 <template>
     <div class="card card-container mb-4">
-        <img
-            src="@/assets/images/truyen_kieu_1.jpeg"
-            class="card-img-top card-img"
-            alt="..."
-            @click="goToBookDetail(10001)"
-        />
+        <img :src="book.book_image" class="card-img-top card-img" alt="..." @click="goToBookDetail(book._id)" />
         <div class="card-body">
-            <h4 class="card-title" @click="goToBookDetail(10001)">Truyen Kieu</h4>
+            <h4 class="card-title" @click="goToBookDetail(book._id)">{{ book.book_name }}</h4>
             <div class="card-subtitle fw-bold mt-3">
                 <span class="">Tác giả: </span>
-                <span class="">Nguyen Du</span>
+                <span class="">{{ book.book_authors }}</span>
             </div>
             <div class="card-subtitle mt-2">
-                <span class="">Danhn mục: </span>
-                <span class=""> Truyện cổ tích </span>
+                <span class="">Chủ đề: </span>
+                <span class="">{{ book.book_topic }}</span>
             </div>
             <div class="d-flex justify-content-center">
-                <button class="mt-4 btn btn-outline-info" @click="goToBorrowingOrder">Đặt mượn</button>
+                <button class="mt-4 btn btn-outline-info" @click="goToBorrowingOrder(book.book_id)">Đặt mượn</button>
             </div>
         </div>
     </div>
@@ -47,8 +52,14 @@ const goToBorrowingOrder = () => {
     color: var(--dark-text-color);
 }
 .card-title {
-    font-size: 1.6rem;
+    --max-line: 2;
     font-weight: bold;
+    line-height: 1.8rem;
+    height: 3.6rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--max-line);
 }
 .card-subtitle {
     font-size: 1.4rem;

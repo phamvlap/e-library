@@ -38,7 +38,7 @@ class BookService {
                 ? new mongoose.Types.ObjectId(filter.book_topic)
                 : null;
         }
-        const books = await Book.aggregate([
+        let query = Book.aggregate([
             {
                 $match: conditions,
             },
@@ -61,6 +61,15 @@ class BookService {
                 foreignField: '_id',
                 as: 'topic',
             });
+        if (filter.created_at_sort) {
+            query = query.sort({
+                createdAt: Number(filter.created_at_sort),
+            });
+        }
+        if(filter.limit) {
+            query = query.limit(Number(filter.limit));
+        }
+        const books = await query;
         return books;
     }
     async findById(_id) {

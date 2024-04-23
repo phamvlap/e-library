@@ -44,6 +44,8 @@ const BookSchema = mongoose.Schema({
         ref: 'Topic',
         required: [true, 'Please provide a topic id'],
     },
+}, {
+    timestamp: true,
 });
 
 export default mongoose.model('Book', BookSchema);

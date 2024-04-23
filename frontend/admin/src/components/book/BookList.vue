@@ -17,6 +17,7 @@ let filter = ref({
     released_year: '',
     name: '',
 });
+let isMounted = ref(false);
 
 const getBooks = async (filter = {}) => {
     try {
@@ -31,11 +32,12 @@ const getBooks = async (filter = {}) => {
         }
         const bookService = new BookService();
         const response = await bookService.getBooks(customFilter);
+
         if (response.status === 'success') {
             const data = response.data.map((book) => {
                 return {
                     _id: book._id,
-                    book_image: Helper.formatImageUrl(book.images[0].image_url),
+                    book_image: Helper.formatImageUrl(book.images[0]?.image_url),
                     book_name: book.book_name,
                     book_authors: book.book_authors,
                     book_topic: book.topic[0].topic_name,
@@ -46,7 +48,7 @@ const getBooks = async (filter = {}) => {
             books.value = data;
         }
     } catch (error) {
-        books.value = [];
+        console.log(error)
     }
 };
 const getTopics = async () => {
@@ -115,6 +117,7 @@ onMounted(async () => {
     await getBooks(filter);
     await getTopics();
     await getReleasedYears();
+    isMounted.value = true;
 });
 </script>
 
@@ -176,7 +179,7 @@ onMounted(async () => {
             </div>
         </div>
         <!-- table -->
-        <table class="table table-striped table-hover border mt-2">
+        <table v-if="isMounted" class="table table-striped table-hover border mt-2">
             <thead>
                 <tr>
                     <th scope="col">#</th>

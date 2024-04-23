@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, defineProps, defineEmits } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import * as yup from 'yup';
 import { Form, Field, ErrorMessage } from 'vee-validate';
@@ -85,6 +85,11 @@ const submitBook = () => {
     if (uploadedImages.value.length > 0) {
         localBook.value.uploaded_images = uploadedImages.value;
     }
+    validateNotTextType();
+    if(Object.values(errors.value).filter(error => error !== '').length > 0) {
+        return;
+    }
+    console.log('submit', errors)
     $emits('submit:book', localBook.value);
 };
 const fetchPulishers = async () => {
@@ -225,7 +230,7 @@ onMounted(async () => {
                                 {{ topic.topic_name }}
                             </option>
                         </select>
-                        <span class="error-feedback">{{ errors.topic }}</span>
+                        <span class="error-feedback">{{ errors.topic_id }}</span>
                     </div>
                 </div>
                 <div class="mb-3 row">
@@ -255,7 +260,7 @@ onMounted(async () => {
                             @change="handleUploadImages"
                             multiple
                         />
-                        <span class="error-feedback">{{ errors.book_images }}</span>
+                        <span class="error-feedback">{{ errors.uploaded_images }}</span>
                     </div>
                     <div class="row" v-if="uploadedImagesSrc.length > 0">
                         <div class="col col-md-3 p-2" v-for="(imageSrc, index) in uploadedImagesSrc" :key="index">

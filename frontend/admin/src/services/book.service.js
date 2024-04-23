@@ -6,7 +6,7 @@ class BookService {
     }
 
     async getBooks(filter) {
-        if (filter) {
+        if (Object.keys(filter).length > 0) {
             const query = Object.keys(filter)
                 .map((key) => `${key}=${filter[key]}`)
                 .join('&');

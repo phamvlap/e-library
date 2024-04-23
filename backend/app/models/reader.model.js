@@ -24,7 +24,7 @@ const ReaderSchema = mongoose.Schema(
         reader_gender: {
             type: String,
             enum: {
-                values: ['male', 'female', 'other'],
+                values: ['MALE', 'FEMALE', 'OTHER'],
             },
             required: [true, 'Please provide a reader gender'],
         },

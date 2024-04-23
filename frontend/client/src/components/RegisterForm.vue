@@ -1,9 +1,8 @@
 <script setup>
-import { ref, onMounted, defineProps, defineEmits } from 'vue';
+import { ref, defineProps, defineEmits } from 'vue';
 import { useRouter } from 'vue-router';
 import * as yup from 'yup';
 import { Form, Field, ErrorMessage } from 'vee-validate';
-import Helper from '@/utils/helper.js';
 import Swal from 'sweetalert2';
 import Gender from '@/enums/gender.js';
 
@@ -64,7 +63,7 @@ const validateDobAndGender = () => {
 };
 const submitReader = () => {
     validateDobAndGender();
-    if (Object.keys(errors.value).length > 0) {
+    if (Object.values(errors.value).filter((value) => value !== '').length > 0) {
         return;
     }
     $emits('submit:reader', localReader.value);
@@ -85,61 +84,67 @@ const handleCancel = () => {
         }
     });
 };
-
-onMounted(async () => {});
 </script>
 
 <template>
     <Form @submit="submitReader" :validation-schema="readerSchema">
         <div class="mb-3">
-            <label for="reader_first_name" class="col-form-label">Họ độc giả: </label>
-            <div>
-                <Field
-                    type="text"
-                    class="form-control"
-                    id="reader_first_name"
-                    name="reader_first_name"
-                    v-model="localReader.reader_first_name"
-                />
-                <ErrorMessage name="reader_first_name" class="error-feedback" />
+            <div class="row">
+                <div class="col col-md-6">
+                    <label for="reader_first_name" class="col-form-label">Họ: </label>
+                    <div>
+                        <Field
+                            type="text"
+                            class="form-control"
+                            id="reader_first_name"
+                            name="reader_first_name"
+                            v-model="localReader.reader_first_name"
+                        />
+                        <ErrorMessage name="reader_first_name" class="error-feedback" />
+                    </div>
+                </div>
+                <div class="col col-md-6">
+                    <label for="reader_last_name" class="col-form-label">Tên: </label>
+                    <div>
+                        <Field
+                            type="text"
+                            class="form-control"
+                            id="reader_last_name"
+                            name="reader_last_name"
+                            v-model="localReader.reader_last_name"
+                        />
+                        <ErrorMessage name="reader_last_name" class="error-feedback" />
+                    </div>
+                </div>
             </div>
         </div>
         <div class="mb-3">
-            <label for="reader_last_name" class="col-form-label">Tên độc giả: </label>
-            <div>
-                <Field
-                    type="text"
-                    class="form-control"
-                    id="reader_last_name"
-                    name="reader_last_name"
-                    v-model="localReader.reader_last_name"
-                />
-                <ErrorMessage name="reader_last_name" class="error-feedback" />
-            </div>
-        </div>
-        <div class="mb-3">
-            <label for="reader_dob" class="col-form-label">Ngày sinh: </label>
-            <div>
-                <input
-                    type="date"
-                    class="form-control"
-                    id="reader_dob"
-                    name="reader_dob"
-                    v-model="localReader.reader_dob"
-                />
-                <span class="error-feedback">{{ errors.reader_dob }}</span>
-            </div>
-        </div>
-        <div class="mb-3">
-            <label for="reader_gender" class="col-form-label">Giới tính: </label>
-            <div>
-                <select class="form-select select" name="reader_gender" v-model="localReader.reader_gender">
-                    <option disabled value="">-- Chọn --</option>
-                    <option v-for="(item, index) in Gender.getKeys()" :value="item" :key="index">
-                        {{ Gender.retrieveGender(item) }}
-                    </option>
-                </select>
-                <span class="error-feedback">{{ errors.reader_gender }}</span>
+            <div class="row">
+                <div class="col col-md-6">
+                    <label for="reader_dob" class="col-form-label">Ngày sinh: </label>
+                    <div>
+                        <input
+                            type="date"
+                            class="form-control"
+                            id="reader_dob"
+                            name="reader_dob"
+                            v-model="localReader.reader_dob"
+                        />
+                        <span class="error-feedback">{{ errors.reader_dob }}</span>
+                    </div>
+                </div>
+                <div class="col col-md-6">
+                    <label for="reader_gender" class="col-form-label">Giới tính: </label>
+                    <div>
+                        <select class="form-select select" name="reader_gender" v-model="localReader.reader_gender">
+                            <option disabled value="">-- Chọn --</option>
+                            <option v-for="(item, index) in Gender.getKeys()" :value="item" :key="index">
+                                {{ Gender.retrieveGender(item) }}
+                            </option>
+                        </select>
+                        <span class="error-feedback">{{ errors.reader_gender }}</span>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="mb-3">

@@ -20,7 +20,7 @@ export default {
             ],
         },
         {
-            path: 'borrowing-order',
+            path: ':id/borrowing-order',
             name: 'user.borrowing-order',
             component: () => import('@/components/user/UserBorrowingOrder.vue'),
         },

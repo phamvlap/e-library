@@ -1,3 +1,4 @@
+import jwt from 'jsonwebtoken';
 import { StatusCodes } from 'http-status-codes';
 import { BadRequestError } from './../errors/index.js';
 import AccountService from './../services/account.service.js';
@@ -11,6 +12,7 @@ class AccountController {
                 account_id: req.body.account_id,
                 account_password: req.body.account_password,
             };
+            console.log(payload)
             const data = await accountService.login(payload);
             return res.status(StatusCodes.OK).json({
                 status: 'success',
@@ -32,6 +34,41 @@ class AccountController {
                 status: 'success',
                 data: {
                     message: 'Password changed successfully',
+                },
+            });
+        } catch (err) {
+            next(new BadRequestError(err.message));
+        }
+    }
+    async getMe(req, res, next) {
+        try {
+            const authHeader = req.headers.authorization;
+            const token = authHeader?.split(' ')[1];
+            if (!token) {
+                throw new UnauthorizedError('Missing token.');
+            }
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            const accountId = decoded.account.account_id;
+            if(!accountId) {
+                throw new UnauthorizedError('Unauthorized account.');
+            }
+            const data = await accountService.getMe(accountId);
+            return res.status(StatusCodes.OK).json({
+                status: 'success',
+                data,
+            });
+        } catch (err) {
+            next(new BadRequestError(err.message));
+        }
+    }
+    async logout(req, res, next) {
+        try {
+            // const accountService = new AccountService();
+            // await accountService.logout();
+            return res.status(StatusCodes.OK).json({
+                status: 'success',
+                data: {
+                    message: 'Logout successfully',
                 },
             });
         } catch (err) {

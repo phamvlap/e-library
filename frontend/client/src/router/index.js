@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 import bookRoutes from '@/router/bookRoutes.js';
 import userRoutes from '@/router/userRoutes.js';
+import { useReaderStore } from '@/stores/reader.js';
 
 const routes = [
     {
@@ -41,6 +42,15 @@ const routes = [
 const router = createRouter({
     history: createWebHistory(),
     routes,
+});
+
+router.beforeEach(async (to, from) => {
+    const store = useReaderStore();
+    const isReaderLoggedIn = localStorage.getItem('reader-is-logged-in');
+    if (isReaderLoggedIn) {
+        await store.getMe();
+    }
+    return true;
 });
 
 export default router;

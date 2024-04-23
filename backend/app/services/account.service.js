@@ -28,6 +28,43 @@ class AccountService {
         const account = await Account.create(data);
         return account;
     }
+    async getMe(accountId) {
+        const readerService = new ReaderService();
+        const staffService = new StaffService();
+        
+        const account = await this.findById(accountId);
+        if (!account) {
+            throw new BadRequestError('Account not found');
+        }
+        let data = null;
+        if (accountId.startsWith('R')) {
+            const reader = await readerService.findById(accountId);
+            data = {
+                reader_id: reader.reader_id,
+                reader_first_name: reader.reader_first_name,
+                reader_last_name: reader.reader_last_name,
+                reader_dob: reader.reader_dob,
+                reader_gender: reader.reader_gender,
+                reader_address: reader.reader_address,
+                reader_phone: reader.reader_phone,
+            };
+        } else if (accountId.startsWith('S')) {
+            const staff = await staffService.findById(accountId);
+            data = {
+                staff_id: staff.staff_id,
+                staff_name: staff.staff_name,
+                staff_role: staff.staff_role,
+                staff_address: staff.staff_address,
+                staff_phone: staff.staff_phone,
+            };
+        }
+        return {
+            account: {
+                account_id: account.account_id,
+            },
+            data,
+        };
+    }
     async login(payload) {
         const readerService = new ReaderService();
         const staffService = new StaffService();
@@ -42,7 +79,6 @@ class AccountService {
         if (!bcrypt.compareSync(payload.account_password, account.account_password)) {
             throw new BadRequestError('Password is incorrect');
         }
-
         let data = null;
         if (account.account_id.startsWith('R')) {
             const reader = await readerService.findById(account.account_id);
@@ -65,15 +101,25 @@ class AccountService {
                 staff_phone: staff.staff_phone,
             };
         }
-        const token = jwt.sign(data, process.env.JWT_SECRET, {
-            expiresIn: process.env.JWT_EXPIRES_IN,
-        });
+        const token = jwt.sign({
+            account: {
+                account_id: account.account_id,
+            }
+        }, process.env.JWT_SECRET);
+        console.log('token', token)
+         // expiresIn: process.env.JWT_EXPIRES_IN,
         return {
+            account: {
+                account_id: account.account_id,
+            },
             data,
             token,
-            expiresIn: 24 * 60 * 60,
+            // expiresIn: 24 * 60 * 60,
         };
     }
+    // async logout() {
+    //     return 
+    // }
     async changePassword(accountId, payload) {
         const currAccount = await this.findById(accountId);
         if (!currAccount) {

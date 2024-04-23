@@ -1,28 +1,109 @@
 <script setup>
+import { ref, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import BookService from '@/services/book.service.js';
+import Helper from '@/utils/helper.js';
+import { useReaderStore } from '@/stores/reader.js';
+import { toast } from 'vue3-toastify';
+import BorrowingDetailService from '@/services/borrowingDetail.service.js';
+
+const route = useRoute();
+const router = useRouter();
+const bookId = route.params.id;
+let book = ref({});
+let selectedQuantity = ref(1);
+const store = useReaderStore();
+let reader = store.reader;
+
+const fetchBook = async (bookId) => {
+    try {
+        const bookService = new BookService();
+        const response = await bookService.getBook(bookId);
+        if (response.status === 'success') {
+            const data = response.data[0];
+            book.value = {
+                _id: data._id,
+                book_name: data.book_name,
+                book_authors: data.book_authors,
+                book_quantity: data.book_quantity,
+                book_borrowed_quantity: data.book_borrowed_quantity,
+                publisher_name: data.publisher[0].publisher_name,
+                topic_id: data.topic[0]._id,
+                topic_name: data.topic[0].topic_name,
+                book_image: Helper.formatImageUrl(data.images[0].image_url),
+            };
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+const increaseQuantity = () => {
+    if (selectedQuantity.value === book.value.book_quantity - book.value.book_borrowed_quantity) {
+        toast.error('Số lượng sách đã hết');
+        return;
+    } else {
+        selectedQuantity.value += 1;
+    }
+};
+const decreaseQuantity = () => {
+    if (selectedQuantity.value > 0) {
+        selectedQuantity.value -= 1;
+    }
+};
+const handleOrderBorrowing = async () => {
+    try {
+        const data = {
+            book_id: book.value._id,
+            reader_id: reader.reader_id,
+            borrowing_quantity: selectedQuantity.value,
+            borrowed_date: new Date().toISOString(),
+            status_updated_by: reader.reader_id,
+        };
+        const borrowingDetailService = new BorrowingDetailService();
+        const response = await borrowingDetailService.createBorrowingDetail(data);
+        if (response.status === 'success') {
+            toast.success('Đặt mượn sách thành công', {
+                duration: 1500,
+                onClose: () => {
+                    router.push({
+                        name: 'user.borrowed-books',
+                    });
+                },
+            });
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+onMounted(async () => {
+    await fetchBook(bookId);
+    console.log(book.value);
+});
 </script>
 <template>
     <div class="p-2">
         <h2 class="text-center">Xác nhận mượn sách</h2>
-        <div class="row m-mt-3">
+        <div class="row mt-4">
             <div class="col col-md-6">
                 <h3 class="text-center title">Thông tin sách</h3>
                 <div class="d-flex justify-content-center align-item-center mt-3">
-                    <img src="@/assets/images/truyen_kieu_1.jpeg" alt="book" class="image" />
+                    <img :src="Helper.formatImageUrl(book.book_image)" alt="book" class="image" />
                 </div>
-                <h3 class="fw-bold book-name mt-3">Truyện Kiều</h3>
+                <h3 class="fw-bold book-name mt-5">{{ book.book_name }}</h3>
                 <div class="p-2 mt-2 text">
                     <span class="fw-bold">Tác giả: </span>
-                    <span> Nguyễn Du </span>
+                    <span>{{ book.book_authors }}</span>
                 </div>
                 <div class="p-2 mt-2 text">
                     <span class="fw-bold">Chủ đề: </span>
-                    <span>Thơ ca </span>
+                    <span>{{ book.topic_name }}</span>
                 </div>
                 <div class="p-2 mt-2 text">
                     <span class="fw-bold">Nhà xuất bản: </span>
-                    <span> NXB Văn Học </span>
+                    <span>{{ book.publisher_name }}</span>
                 </div>
             </div>
             <div class="col col-md-6">
@@ -30,15 +111,15 @@ import { faCheck } from '@fortawesome/free-solid-svg-icons';
                 <div>
                     <div class="p-2 mt-2 text">
                         <span class="fw-bold">Họ tên: </span>
-                        <span> Nguyễn Du </span>
+                        <span>{{ reader.reader_first_name + ' ' + reader.reader_last_name }}</span>
                     </div>
                     <div class="p-2 mt-2 text">
                         <span class="fw-bold">Số điện thoại: </span>
-                        <span>Thơ ca </span>
+                        <span>{{ reader.reader_phone }}</span>
                     </div>
                     <div class="p-2 mt-2 text">
                         <span class="fw-bold">Địa chỉ: </span>
-                        <span> NXB Văn Học </span>
+                        <span>{{ reader.reader_address }}</span>
                     </div>
                 </div>
                 <div class="">
@@ -46,14 +127,14 @@ import { faCheck } from '@fortawesome/free-solid-svg-icons';
                     <div class="p-2 mt-2 text">
                         <span class="fw-bold">Số lượng: </span>
                         <div class="d-inline-block ms-4 border rounded-2">
-                            <button class="p-2" type="button">-</button>
-                            <span class="p-3">1</span>
-                            <button class="p-2" type="button">+</button>
+                            <button class="py-2 px-3" type="button" @click="decreaseQuantity">-</button>
+                            <span class="p-3">{{ selectedQuantity }}</span>
+                            <button class="py-2 px-3" type="button" @click="increaseQuantity">+</button>
                         </div>
                     </div>
                 </div>
                 <div class="mt-4 text-center">
-                    <button class="btn btn-success">
+                    <button class="btn btn-success" @click="handleOrderBorrowing">
                         <FontAwesomeIcon :icon="faCheck" />
                         <span class="ms-1">Xác nhận mượn</span>
                     </button>

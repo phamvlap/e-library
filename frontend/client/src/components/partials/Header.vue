@@ -2,6 +2,13 @@
 import { ref } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
+import { useReaderStore } from '@/stores/reader.js';
+
+const store = useReaderStore();
+
+const handleLogout = () => {
+    store.logout();
+};
 
 const menu = [
     {
@@ -27,8 +34,8 @@ const menu = [
                     </ul>
                 </div>
                 <div class="d-flex align-items-center">
-                    <div class="d-flex align-items-center position-relative p-2 account-section">
-                        <p class="me-2">Nguyen Van A</p>
+                    <div class="d-flex align-items-center position-relative p-2 account-section" v-if="store.reader">
+                        <p class="me-2">{{ store.reader.reader_first_name + ' ' + store.reader.reader_last_name }}</p>
                         <FontAwesomeIcon :icon="faAngleDown" />
                         <div
                             :class="{
@@ -46,17 +53,20 @@ const menu = [
                                     >
                                 </li>
                                 <li class="account-menu__item">
-                                    <RouterLink to="/logout" class="account-menu__link d-inline-block py-3 px-4 w-100"
-                                        >Đăng xuất</RouterLink
+                                    <div
+                                        class="account-menu__link d-inline-block py-3 px-4 w-100"
+                                        @click="handleLogout"
                                     >
+                                        Đăng xuất
+                                    </div>
                                 </li>
                             </ul>
                         </div>
                     </div>
-                    <!-- <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-center" v-else>
                         <RouterLink to="/login" class="me-3">Đăng nhập</RouterLink>
                         <RouterLink to="/register">Đăng ký</RouterLink>
-                    </div> -->
+                    </div>
                 </div>
             </div>
         </div>

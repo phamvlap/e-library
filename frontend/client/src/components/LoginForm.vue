@@ -3,69 +3,24 @@ import { ref, onMounted, defineProps, defineEmits } from 'vue';
 import { useRouter } from 'vue-router';
 import * as yup from 'yup';
 import { Form, Field, ErrorMessage } from 'vee-validate';
-import Swal from 'sweetalert2';
 
-const router = useRouter();
 const props = defineProps({
     reader: {
         type: Object,
         required: true,
-    },
-    isUpdating: {
-        type: Boolean,
-        default: false,
     },
 });
 const $emits = defineEmits(['submit:reader']);
 let localReader = ref({
     ...props.reader,
 });
-let errors = ref({});
 
 const readerSchema = yup.object().shape({
     reader_id: yup.string().required('Mã độc giả không được để trống'),
     reader_password: yup.string().required('Mật khẩu không được để trống').min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
 });
-const validateDobAndGender = () => {
-    if (localReader.value.reader_dob === '') {
-        errors.value.reader_dob = 'Ngày sinh không được để trống';
-    } else {
-        const dob = new Date(localReader.value.reader_dob);
-        const now = new Date();
-        if (dob >= now) {
-            errors.value.reader_dob = 'Ngày sinh không hợp lệ';
-        } else {
-            errors.value.reader_dob = '';
-        }
-    }
-    if (localReader.value.reader_gender === '') {
-        errors.value.reader_gender = 'Giới tính không được để trống';
-    } else {
-        errors.value.reader_gender = '';
-    }
-};
 const submitReader = () => {
-    validateDobAndGender();
-    if (Object.keys(errors.value).length > 0) {
-        return;
-    }
     $emits('submit:reader', localReader.value);
-};
-const handleCancel = () => {
-    Swal.fire({
-        title: 'Xác nhận hủy',
-        text: 'Bạn có chắc chắn muốn hủy bỏ thao tác?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Hủy',
-        cancelButtonText: 'Không',
-    }).then((result) => {
-        if (result.isConfirmed) {
-            router.push('/admin/readers');
-        }
-    });
 };
 
 onMounted(async () => {});
@@ -113,7 +68,7 @@ onMounted(async () => {});
             </p>
         </div>
         <div class="text-center mt-5">
-            <button type="submit" class="btn btn-info ms-3" @click="validateDobAndGender">Đăng nhập</button>
+            <button type="submit" class="btn btn-info ms-3">Đăng nhập</button>
         </div>
     </Form>
 </template>

@@ -16,7 +16,9 @@ class BorrowingDetailService {
             status_updated_by: payload.status_updated_by,
         };
         let data = Helper.extractData(borrowingDetail);
-        data.status = data.status.toUpperCase();
+        if(data.status) {
+            data.status = data.status.toUpperCase();
+        }
         return data;
     }
     async find(filter) {

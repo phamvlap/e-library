@@ -42,7 +42,7 @@ const goToBorrowingOrder = (bookId) => {
                 <span class="">{{ book.book_topic }}</span>
             </div>
             <div class="d-flex justify-content-center">
-                <button class="mt-4 btn btn-outline-info" @click="goToBorrowingOrder(book.book_id)">Đặt mượn</button>
+                <button class="mt-4 btn btn-outline-info" @click="goToBorrowingOrder(book._id)">Đặt mượn</button>
             </div>
         </div>
     </div>

@@ -3,7 +3,9 @@ import { ref, onMounted } from 'vue';
 import BookCard from './../components/book/BookCard.vue';
 import BookService from '@/services/book.service.js';
 import Helper from '@/utils/helper.js';
+import { useReaderStore } from '@/stores/reader.js';
 
+const store = useReaderStore();
 let newBooks = ref([]);
 let popularBooks = ref([]);
 
@@ -52,7 +54,6 @@ const getPopularBooks = async (quantity) => {
 onMounted(async () => {
     await getNewBooks(6);
     await getPopularBooks(6);
-    console.log(popularBooks.value);
 });
 </script>
 <template>

@@ -76,7 +76,12 @@ class ReaderService {
             account_id: data.reader_id,
             account_password: payload.reader_password,
         });
-        return reader;
+        return {
+            account: {
+                account_id: account.account_id,
+            },
+            reader
+        };
     }
     async update(readerId, payload) {
         const filter = {

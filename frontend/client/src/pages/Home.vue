@@ -1,5 +1,59 @@
 <script setup>
+import { ref, onMounted } from 'vue';
 import BookCard from './../components/book/BookCard.vue';
+import BookService from '@/services/book.service.js';
+import Helper from '@/utils/helper.js';
+
+let newBooks = ref([]);
+let popularBooks = ref([]);
+
+const getNewBooks = async (quantity) => {
+    try {
+        const bookService = new BookService();
+        const response = await bookService.getNewBooks(quantity);
+        if (response.status === 'success') {
+            const data = response.data.map((book) => {
+                return {
+                    _id: book._id,
+                    book_image: Helper.formatImageUrl(book.images[0]?.image_url),
+                    book_name: book.book_name,
+                    book_authors: book.book_authors,
+                    book_topic: book.topic[0].topic_name,
+                };
+            });
+            newBooks.value = data;
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+const getPopularBooks = async (quantity) => {
+    try {
+        const bookService = new BookService();
+        const response = await bookService.getPopularBooks(quantity);
+        if (response.status === 'success') {
+            const data = response.data.map((book) => {
+                return {
+                    _id: book._id,
+                    book_image: Helper.formatImageUrl(book.images[0]?.image_url),
+                    book_name: book.book_name,
+                    book_borrowed_quantity: book.book_borrowed_quantity,
+                    book_authors: book.book_authors,
+                    book_topic: book.topic[0].topic_name,
+                };
+            });
+            popularBooks.value = data;
+        }
+    } catch (error) {
+        console.log(error);
+    }
+};
+
+onMounted(async () => {
+    await getNewBooks(6);
+    await getPopularBooks(6);
+    console.log(popularBooks.value);
+});
 </script>
 <template>
     <div>
@@ -16,23 +70,8 @@ import BookCard from './../components/book/BookCard.vue';
             <div class="mt-4">
                 <h2 class="section-title">Sách mới</h2>
                 <div class="row mt-3">
-                    <div class="col col-md-2">
-                        <BookCard />
-                    </div>
-                    <div class="col col-md-2">
-                        <BookCard />
-                    </div>
-                    <div class="col col-md-2">
-                        <BookCard />
-                    </div>
-                    <div class="col col-md-2">
-                        <BookCard />
-                    </div>
-                    <div class="col col-md-2">
-                        <BookCard />
-                    </div>
-                    <div class="col col-md-2">
-                        <BookCard />
+                    <div class="col col-md-2" v-for="book in newBooks" :key="book._id">
+                        <BookCard :book="book" />
                     </div>
                 </div>
                 <div class="d-flex justify-content-center mt-2">
@@ -42,23 +81,8 @@ import BookCard from './../components/book/BookCard.vue';
             <div class="mt-4">
                 <h2 class="section-title">Sách đươc mượn nhiều</h2>
                 <div class="row mt-3">
-                    <div class="col col-md-2">
-                        <BookCard />
-                    </div>
-                    <div class="col col-md-2">
-                        <BookCard />
-                    </div>
-                    <div class="col col-md-2">
-                        <BookCard />
-                    </div>
-                    <div class="col col-md-2">
-                        <BookCard />
-                    </div>
-                    <div class="col col-md-2">
-                        <BookCard />
-                    </div>
-                    <div class="col col-md-2">
-                        <BookCard />
+                    <div class="col col-md-2" v-for="book in popularBooks" :key="book._id">
+                        <BookCard :book="book" />
                     </div>
                 </div>
                 <div class="d-flex justify-content-center mt-2">

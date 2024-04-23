@@ -22,6 +22,13 @@ class BookService {
         });
     }
 
+    async getPopularBooks(quantity) {
+        return await this.getBooks({
+            borrowed_quantity_sort: -1,
+            limit: quantity,
+        });
+    }
+
     async getBook(id) {
         return (await this.api.get(`/${id}`)).data;
     }

@@ -66,6 +66,11 @@ class BookService {
                 createdAt: Number(filter.created_at_sort),
             });
         }
+        if(filter.borrowed_quantity_sort) {
+            query = query.sort({
+                book_borrowed_quantity: Number(filter.borrowed_quantity_sort),
+            });
+        }
         if(filter.limit) {
             query = query.limit(Number(filter.limit));
         }

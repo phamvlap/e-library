@@ -32,7 +32,9 @@ class BorrowingDetailController {
                 book_id: req.body.book_id,
                 borrowed_date: req.body.borrowed_date,
                 borrowing_quantity: req.body.borrowing_quantity,
+                status: req.body.status,
                 status_updated_by: req.body.status_updated_by,
+                returned_date: req.body.returned_date,
             };
             const borrowingDetail = await borrowingDetailService.create(payload);
             return res.status(StatusCodes.CREATED).json({

@@ -48,7 +48,7 @@ const getBooks = async (filter = {}) => {
             books.value = data;
         }
     } catch (error) {
-        console.log(error)
+        console.log(error);
     }
 };
 const getTopics = async () => {
@@ -132,7 +132,7 @@ onMounted(async () => {
         </div>
         <div class="p-2 d-flex border justify-content-between align-items-center">
             <!-- filter -->
-            <div class="d-flex">
+            <div class="d-flex" v-if="isMounted">
                 <div class="d-flex align-items-center justify-content-center">
                     <div class="input-group m-0">
                         <label class="input-group-text label" for="select-topic">Chủ đề</label>
@@ -184,7 +184,7 @@ onMounted(async () => {
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Hình ảnh</th>
-                    <th scope="col">Tên sách</th>
+                    <th scope="col" class="book-name-cell">Tên sách</th>
                     <th scope="col">Các tác giả</th>
                     <th scope="col">Chủ đề</th>
                     <th scope="col">Số lượng</th>
@@ -216,7 +216,7 @@ onMounted(async () => {
                 </tr>
             </tbody>
         </table>
-        <nav class="mt-5">
+        <!-- <nav class="mt-5">
             <ul class="pagination justify-content-end custom-pagination">
                 <li class="page-item custom-pagination__item disabled">
                     <a class="page-link custom-pagination__link p-3">
@@ -232,7 +232,7 @@ onMounted(async () => {
                     </a>
                 </li>
             </ul>
-        </nav>
+        </nav> -->
     </div>
 </template>
 
@@ -241,6 +241,7 @@ th,
 td {
     color: var(--dark-text-color);
     padding: 8px;
+    line-height: 1.4;
 }
 .cell-image {
     width: 60px;
@@ -266,5 +267,8 @@ td:last-child {
 }
 .custom-pagination__icon {
     font-size: 1.4rem;
+}
+.book-name-cell {
+    width: 560px;
 }
 </style>

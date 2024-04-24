@@ -4,13 +4,13 @@ class BorrowingStatus {
         CONFIRMED: 'Đã xác nhận',
         BORROWED: 'Đang mượn',
         RETURNED: 'Đã trả',
-        CANCELED: 'Đã hủy',
+        CANCELLED: 'Đã hủy',
     };
     static updatedStatus = {
         CONFIRMED: 'Duyệt đơn mượn',
         BORROWED: 'Độc giả đã nhận sách',
         RETURNED: 'Độc giả đã trả sách',
-        CANCELED: 'Hủy đơn mượn',
+        CANCELLED: 'Hủy đơn mượn',
     };
     static getKeys() {
         return Object.keys(this.viewStatus);

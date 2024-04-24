@@ -56,7 +56,9 @@ const submitBook = async (data) => {
         toast.success(`${isUpdating ? 'Cập nhật' : 'Thêm'} sách thành công`, {
             duration: 2500,
             onClose: () => {
-                router.push('/admin/books');
+                router.push({
+                    name: 'book.list',
+                });
             },
         });
     } catch (error) {
@@ -103,7 +105,12 @@ onMounted(async () => {
             {{ isUpdating ? 'Hiệu chỉnh sách' : 'Thêm sách mới' }}
         </h1>
         <div class="p-2">
-            <RouterLink to="/admin/books" class="btn btn-outline-secondary btn-back">
+            <RouterLink
+                :to="{
+                    name: 'book.list',
+                }"
+                class="btn btn-outline-secondary btn-back"
+            >
                 <FontAwesomeIcon :icon="faChevronLeft" />
                 <span class="ms-2">Quay lại</span>
             </RouterLink>

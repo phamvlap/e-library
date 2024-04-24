@@ -9,6 +9,7 @@ const props = defineProps({
         required: true,
     },
 });
+const $emits = defineEmits(['submit:staff-login']);
 let localAccount = ref({
     ...props.account,
 });
@@ -17,12 +18,15 @@ const accountSchema = yup.object().shape({
         .string()
         .required('Mã số cán bộ không được để trống')
         .min(2, 'Mã số cán bộ phải có ít nhất 2 ký tự'),
-    account_password: yup.string().required('Mật khẩu không được để trống').min(2, 'Mật khẩu phải có ít nhất 2 ký tự'),
+    account_password: yup.string().required('Mật khẩu không được để trống').min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
 });
+const handleSubmitLogin = () => {
+    $emits('submit:staff-login', localAccount.value);
+};
 </script>
 
 <template>
-    <Form>
+    <Form @submit="handleSubmitLogin" :validation-schema="accountSchema">
         <div class="form-group">
             <label for="account_id">Mã số cán bộ:</label>
             <Field

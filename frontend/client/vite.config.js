@@ -1,4 +1,5 @@
 import { fileURLToPath, URL } from 'node:url';
+import path from 'node:path';
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 
@@ -16,6 +17,14 @@ export default defineConfig({
             '/api': {
                 target: 'http://localhost:5000',
                 changeOrigin: true,
+            },
+        },
+    },
+    configureWebpack: {
+        resolve: {
+            symlink: false,
+            alias: {
+                vue: path.resolve('./node_modules/vue'),
             },
         },
     },

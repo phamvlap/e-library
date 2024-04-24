@@ -1,36 +1,51 @@
 <script setup>
-import { onMounted, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { computed, ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
+import { useStaffStore } from './../../stores/staff.js';
 
 const menuList = [
     {
         name: 'Trang chủ',
-        path: '/admin',
+        to: {
+            name: 'home',
+        },
     },
     {
         name: 'Quản lý sách',
-        path: '/admin/books',
+        to: {
+            name: 'book.list',
+        },
     },
     {
         name: 'Quản lý mượn trả',
-        path: '/admin/borrowings',
+        to: {
+            name: 'borrowing.list',
+        },
     },
     {
         name: 'Quản lý độc giả',
-        path: '/admin/readers',
+        to: {
+            name: 'reader.list',
+        },
     },
     {
         name: 'Quản lý nhân viên',
-        path: '/admin/staffs',
+        to: {
+            name: 'staff.list',
+        },
     },
 ];
-const route = useRoute();
-const currentPath = computed(() => {
-    return route.path;
+const router = useRouter();
+const store = useStaffStore();
+const staff = store.staff;
+let isMounted = ref(false);
+const currentPathName = computed(() => router.currentRoute.value.name);
+
+onMounted(() => {
+    isMounted.value = true;
 });
-onMounted(() => {});
 </script>
 
 <template>
@@ -38,11 +53,11 @@ onMounted(() => {});
         <div class="d-flex flex-column">
             <div class="p-2 admin-section d-flex flex-column align-items-center justify-content-center">
                 <div class="dropdown-wrapper">
-                    <div class="dropdown w-100">
+                    <div class="dropdown w-100" v-if="isMounted">
                         <div class="dropdown-toggle w-100 text-center" data-bs-toggle="dropdown" aria-expanded="false">
                             <div class="admin-account p-2 d-inline-block">
                                 <FontAwesomeIcon :icon="faUserCircle" />
-                                <span class="d-inline mx-2">S1001</span>
+                                <span class="d-inline mx-2">{{ staff.staff_name }}</span>
                             </div>
                         </div>
                         <ul class="dropdown-menu w-100">
@@ -54,21 +69,21 @@ onMounted(() => {});
             </div>
             <div class="p-2">
                 <ul>
-                    <li v-for="(item, index) in menuList">
+                    <li v-for="(item, index) in menuList" :key="index">
                         <RouterLink
-                            :to="item.path"
+                            :to="{
+                                name: item.to.name,
+                            }"
                             :class="{
                                 'd-inline-block w-100 p-3 menu-item': true,
-                                'active-menu': (currentPath.split('/admin')[1].length > 0
-                                    ? currentPath.split('/admin')[1]
-                                    : currentPath
-                                ).includes(
-                                    item.path.split('/admin')[1].length > 0 ? item.path.split('/admin')[1] : item.path,
-                                ),
+                                'active-menu':
+                                    item.to.name === 'home'
+                                        ? currentPathName === item.to.name
+                                        : currentPathName.includes(item.to.name.split('.')[0]),
                             }"
-                            @click="activeMenu = index"
-                            >{{ item.name }}</RouterLink
                         >
+                            {{ item.name }}
+                        </RouterLink>
                     </li>
                 </ul>
             </div>

@@ -1,14 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-import bookRoutes from '@/router/book.route.js';
-import readerRoutes from '@/router/reader.route.js';
-import borrowingRoutes from '@/router/borrowing.route.js';
-import staffRoutes from '@/router/staff.route.js';
+import bookRoutes from './book.route.js';
+import readerRoutes from './reader.route.js';
+import borrowingRoutes from './borrowing.route.js';
+import staffRoutes from './staff.route.js';
+import { useStaffStore } from './../stores/staff.js';
 
 const routes = [
     {
-        path: '/admin',
+        path: '/',
+        alias: '/admin',
         component: () => import('@/layouts/MainLayout.vue'),
+        meta: {
+            requiresAuth: true,
+        },
         children: [
             {
                 path: '',
@@ -42,6 +47,22 @@ const routes = [
 const router = createRouter({
     history: createWebHistory(),
     routes,
+});
+
+router.beforeEach(async (to, from, next) => {
+    const store = useStaffStore();
+    const isLoggedStaff = localStorage.getItem('staff-is-logged-in');
+
+    if (isLoggedStaff) {
+        await store.getMe();
+    }
+    if (to.meta.requiresAuth && !store.isAuth() && to.name !== 'login') {
+        next({
+            name: 'login',
+        });
+    } else {
+        next();
+    }
 });
 
 export default router;

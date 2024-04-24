@@ -79,7 +79,12 @@ onMounted(async () => {
     <div class="p-2">
         <h1 class="p-2 text-center">Chi tiết sách</h1>
         <div class="p-2 d-flex justify-content-between">
-            <RouterLink to="/admin/books" class="btn btn-outline-secondary btn-back">
+            <RouterLink
+                :to="{
+                    name: 'book.list',
+                }"
+                class="btn btn-outline-secondary btn-back"
+            >
                 <FontAwesomeIcon :icon="faChevronLeft" />
                 <span class="ms-2">Quay lại</span>
             </RouterLink>

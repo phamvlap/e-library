@@ -6,13 +6,27 @@ class BookService {
     }
 
     async getBooks(filter) {
-        if (Object.keys(filter).length > 0) {
+        if (filter) {
             const query = Object.keys(filter)
                 .map((key) => `${key}=${filter[key]}`)
                 .join('&');
             return (await this.api.get(`/?${query}`)).data;
         }
         return (await this.api.get('/')).data;
+    }
+
+    async getNewBooks(quantity) {
+        return await this.getBooks({
+            created_at_sort: -1,
+            limit: quantity,
+        });
+    }
+
+    async getPopularBooks(quantity) {
+        return await this.getBooks({
+            borrowed_quantity_sort: -1,
+            limit: quantity,
+        });
     }
 
     async getBook(id) {

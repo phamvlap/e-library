@@ -31,7 +31,9 @@ const submitStaff = async (data) => {
         toast.success(`${isUpdating ? 'Cập nhật' : 'Thêm'} nhân viên thành công`, {
             duration: 2500,
             onClose: () => {
-                router.push('/admin/staffs');
+                router.push({
+                    name: 'staff.list',
+                });
             },
         });
     } catch (error) {
@@ -72,7 +74,12 @@ onMounted(async () => {
             {{ isUpdating ? 'Cập nhật nhân viên' : 'Thêm nhân viên mới' }}
         </h1>
         <div class="p-2">
-            <RouterLink to="/admin/staffs" class="btn btn-outline-secondary btn-back">
+            <RouterLink
+                :to="{
+                    name: 'staff.list',
+                }"
+                class="btn btn-outline-secondary btn-back"
+            >
                 <FontAwesomeIcon :icon="faChevronLeft" />
                 <span class="ms-2">Quay lại</span>
             </RouterLink>

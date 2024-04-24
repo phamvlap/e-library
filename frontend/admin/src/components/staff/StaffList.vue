@@ -2,15 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import {
-    faTrash,
-    faSearch,
-    faAngleLeft,
-    faAngleRight,
-    faPlus,
-    faPen,
-    faRotate,
-} from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faSearch, faPlus, faPen, faRotate } from '@fortawesome/free-solid-svg-icons';
 import StaffRole from '@/enums/staffRoles.js';
 import StaffService from '@/services/staff.service.js';
 import { toast } from 'vue3-toastify';
@@ -137,7 +129,7 @@ onMounted(async () => {
                         aria-describedby="search-book"
                         v-model="filter.staff_name"
                     />
-                    <button class="btn btn-outline-secondary" type="button" id="search-book">
+                    <button class="btn btn-outline-secondary" type="submit" id="search-book">
                         <FontAwesomeIcon :icon="faSearch" />
                     </button>
                 </form>
@@ -182,7 +174,7 @@ onMounted(async () => {
                 </tr>
             </tbody>
         </table>
-        <nav class="mt-5">
+        <!-- <nav class="mt-5">
             <ul class="pagination justify-content-end custom-pagination">
                 <li class="page-item custom-pagination__item disabled">
                     <a class="page-link custom-pagination__link p-3">
@@ -198,7 +190,7 @@ onMounted(async () => {
                     </a>
                 </li>
             </ul>
-        </nav>
+        </nav> -->
     </div>
 </template>
 

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faChevronLeft, faTrash } from '@fortawesome/free-solid-svg-icons';
@@ -8,7 +8,10 @@ import Helper from '@/utils/helper.js';
 import BorrowingStatus from '@/enums/borrowingStatus.js';
 import { toast } from 'vue3-toastify';
 import Swal from 'sweetalert2';
+import { useStaffStore } from './../../stores/staff';
 
+const store = useStaffStore();
+const staff = store.staff;
 const router = useRouter();
 const props = defineProps({
     reader_id: {
@@ -32,10 +35,12 @@ let detail = ref({});
 let statusList = ref([]);
 let form = ref({
     new_status: '',
+    returned_date: '',
 });
 let errors = ref({
     new_status: '',
 });
+let isMounted = ref(false);
 
 const fetchBorrowingDetail = async (readerId, bookId, borrowedDate) => {
     try {
@@ -92,6 +97,24 @@ const handleUpdateStatus = async (event) => {
         return;
     }
 
+    if (!Helper.isValidStatus(statusList.value[0].status, form.value.new_status)) {
+        errors.value.new_status = Helper.getStatusError(statusList.value[0].status);
+        return;
+    }
+    if (form.value.new_status === 'RETURNED') {
+        if (form.value.returned_date === '') {
+            errors.value.returned_date = 'Ngày trả sách không được để trống';
+            return;
+        }
+        if (new Date(form.value.returned_date) < new Date(detail.value.borrowed_date)) {
+            errors.value.returned_date = 'Ngày trả sách không được nhỏ hơn ngày mượn';
+            return;
+        }
+        if (new Date(form.value.returned_date) > new Date()) {
+            errors.value.returned_date = 'Ngày trả sách không được lớn hơn ngày hiện tại';
+            return;
+        }
+    }
     try {
         const borrowingDetailService = new BorrowingDetailService();
         const data = {
@@ -100,8 +123,11 @@ const handleUpdateStatus = async (event) => {
             borrowing_quantity: detail.value.borrowing_quantity,
             reader_id: readerId.value,
             status: form.value.new_status,
-            status_updated_by: 'S1002', // update staff id later
+            status_updated_by: staff.staff_id,
         };
+        if (form.value.new_status === 'RETURNED') {
+            data['returned_date'] = new Date(form.value.returned_date).toISOString();
+        }
         const response = await borrowingDetailService.createBorrowingDetail(data);
         if (response.status === 'success') {
             await fetchBorrowingDetail(readerId.value, bookId.value, borrowedDate.value);
@@ -150,6 +176,8 @@ const handleDelete = async () => {
 
 onMounted(async () => {
     await fetchBorrowingDetail(readerId.value, bookId.value, borrowedDate.value);
+    console.log(statusList.value);
+    isMounted.value = true;
 });
 </script>
 
@@ -157,7 +185,12 @@ onMounted(async () => {
     <div class="p-2">
         <h1 class="p-2 text-center">Chi tiết mượn trả</h1>
         <div class="p-2 d-flex justify-content-between">
-            <RouterLink to="/admin/borrowings" class="btn btn-outline-secondary btn-back">
+            <RouterLink
+                :to="{
+                    name: 'borrowing.list',
+                }"
+                class="btn btn-outline-secondary btn-back"
+            >
                 <FontAwesomeIcon :icon="faChevronLeft" />
                 <span class="ms-2">Quay lại</span>
             </RouterLink>
@@ -167,7 +200,7 @@ onMounted(async () => {
             </button>
         </div>
         <!-- info -->
-        <div class="row p-2">
+        <div class="row p-2" v-if="isMounted">
             <div class="col col-md-5">
                 <div class="mb-3 row">
                     <div class="col-sm-3 py-2 px-3">Tên độc giả:</div>
@@ -231,11 +264,11 @@ onMounted(async () => {
                 <div>
                     <h2>Chi tiết trạng thái</h2>
                     <div class="my-3 row">
-                        <div class="col-sm-1 py-2 px-3">STT</div>
-                        <div class="col-sm-2 py-2 px-3">Thời gian</div>
-                        <div class="col-sm-3 py-2 px-3">Trạng thái</div>
-                        <div class="col-sm-3 py-2 px-3">Người cập nhật</div>
-                        <div class="col-sm-3 py-2 px-3">Vai trò</div>
+                        <div class="col-sm-1 py-2 px-3 fw-bold">STT</div>
+                        <div class="col-sm-2 py-2 px-3 fw-bold">Thời gian</div>
+                        <div class="col-sm-3 py-2 px-3 fw-bold">Trạng thái sách</div>
+                        <div class="col-sm-3 py-2 px-3 fw-bold">Người cập nhật</div>
+                        <div class="col-sm-3 py-2 px-3 fw-bold">Vai trò</div>
                     </div>
                     <div class="my-3 row" v-for="(item, index) in statusList" :key="index">
                         <div class="col-sm-1 py-2 px-3">{{ index + 1 }}</div>
@@ -250,20 +283,25 @@ onMounted(async () => {
                 <div class="mt-3">
                     <h2>Cập nhật trạng thái đơn mượn</h2>
                     <div class="mt-3">
-                        <form @submit="handleUpdateStatus">
+                        <form @submit="handleUpdateStatus" class="p-3">
                             <div class="input-group m-0">
                                 <label class="input-group-text label" for="new-status">Trạng thái mới:</label>
-                                <select class="form-select" id="new-status" name="new_status" v-model="form.new_status">
-                                    <option class="select-item" disabled value="">-- Chọn --</option>
+                                <select
+                                    class="form-select"
+                                    id="new-status"
+                                    name="new_status"
+                                    v-model="form.new_status"
+                                    :disabled="['RETURNED', 'CANCELLED'].includes(statusList[0].status)"
+                                >
+                                    <option class="select-item" value="">-- Chọn --</option>
                                     <option
                                         class="select-item"
                                         v-for="(item, index) in updatedStatus"
                                         :key="index"
                                         :value="item"
                                         :disabled="
-                                            statusList.map((status) => status.status).includes(item) ||
-                                            (item === 'CANCELED' &&
-                                                statusList.map((status) => status.status).includes('PENDING'))
+                                            statusList.map((status) => status.status).includes('CANCELED') ||
+                                            statusList.map((status) => status.status).includes(item)
                                         "
                                     >
                                         {{ BorrowingStatus.retrieveUpdatedStatus(item) }}
@@ -271,6 +309,17 @@ onMounted(async () => {
                                 </select>
                             </div>
                             <span class="error-feedback">{{ errors.new_status }}</span>
+                            <div class="input-group mt-4" v-if="form.new_status === 'RETURNED'">
+                                <label class="input-group-text label" for="returned_date">Ngày trả sách:</label>
+                                <input
+                                    type="date"
+                                    class="form-control"
+                                    name="returned_date"
+                                    id="returned_date"
+                                    v-model="form.returned_date"
+                                />
+                            </div>
+                            <span class="error-feedback">{{ errors.returned_date }}</span>
                             <div class="mt-4 d-flex justify-content-center">
                                 <button type="submit" class="btn btn-outline-success">Cập nhật</button>
                             </div>

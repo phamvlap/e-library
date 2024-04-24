@@ -28,6 +28,7 @@ let topics = ref([]);
 let errors = ref({});
 let uploadedImagesSrc = ref([]);
 let uploadedImages = ref([]);
+const isUpdating = props.isUpdating;
 
 const bookSchema = yup.object().shape({
     book_name: yup.string().required('Tên sách không được để trống').min(2, 'Tên sách phải có ít nhất 2 ký tự'),
@@ -66,10 +67,12 @@ const validateNotTextType = () => {
     } else {
         errors.value.book_description = '';
     }
-    if (!localBook.value.uploaded_images.length > 0) {
-        errors.value.uploaded_images = 'Hình ảnh không được để trống';
-    } else {
-        errors.value.uploaded_images = '';
+    if (!isUpdating) {
+        if (!localBook.value.uploaded_images.length > 0) {
+            errors.value.uploaded_images = 'Hình ảnh không được để trống';
+        } else {
+            errors.value.uploaded_images = '';
+        }
     }
 };
 const handleUploadImages = (event) => {
@@ -86,10 +89,9 @@ const submitBook = () => {
         localBook.value.uploaded_images = uploadedImages.value;
     }
     validateNotTextType();
-    if(Object.values(errors.value).filter(error => error !== '').length > 0) {
+    if (Object.values(errors.value).filter((error) => error !== '').length > 0) {
         return;
     }
-    console.log('submit', errors)
     $emits('submit:book', localBook.value);
 };
 const fetchPulishers = async () => {
@@ -126,7 +128,9 @@ const handleCancel = () => {
         cancelButtonText: 'Không',
     }).then((result) => {
         if (result.isConfirmed) {
-            router.push('/admin/books');
+            router.push({
+                name: 'book.list',
+            });
         }
     });
 };

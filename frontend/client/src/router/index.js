@@ -32,11 +32,20 @@ const routes = [
         path: '/user',
         component: () => import('@/layouts/UserLayout.vue'),
         children: [userRoutes],
+        meta: {
+            requiresAuth: true,
+        },
     },
     {
         path: '/:pathMatch(.*)*',
-        name: 'not.found',
-        component: () => import('@/pages/NotFound.vue'),
+        component: () => import('@/layouts/MainLayout.vue'),
+        children: [
+            {
+                path: '',
+                name: 'not.found',
+                component: () => import('@/pages/NotFound.vue'),
+            },
+        ],
     },
 ];
 
@@ -45,13 +54,20 @@ const router = createRouter({
     routes,
 });
 
-router.beforeEach(async (to, from) => {
+router.beforeEach(async (to, from, next) => {
     const store = useReaderStore();
     const isReaderLoggedIn = localStorage.getItem('reader-is-logged-in');
+
     if (isReaderLoggedIn) {
         await store.getMe();
     }
-    return true;
+    if (to.meta.requiresAuth && !store.isAuth() && to.name !== 'login') {
+        next({
+            name: 'login',
+        });
+    } else {
+        next();
+    }
 });
 
 export default router;

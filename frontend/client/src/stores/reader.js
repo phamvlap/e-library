@@ -8,6 +8,10 @@ export const useReaderStore = defineStore('reader', () => {
     const router = useRouter();
     let reader = ref(null);
 
+    function isAuth() {
+        return reader.value !== null;
+    }
+
     async function login(data) {
         try {
             const accountService = new AccountService();
@@ -75,5 +79,5 @@ export const useReaderStore = defineStore('reader', () => {
         });
     }
 
-    return { reader, getMe, login, logout };
+    return { reader, isAuth, getMe, login, logout };
 });

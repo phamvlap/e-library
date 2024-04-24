@@ -1,14 +1,13 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
+import { faAngleDown, faBookOpen } from '@fortawesome/free-solid-svg-icons';
 import { useReaderStore } from '@/stores/reader.js';
+import Swal from 'sweetalert2';
 
 const store = useReaderStore();
-
-const handleLogout = () => {
-    store.logout();
-};
+const router = useRouter();
 
 const menu = [
     {
@@ -20,16 +19,47 @@ const menu = [
         path: '/books',
     },
 ];
+
+const handleLogout = () => {
+    Swal.fire({
+        title: 'Bạn có chắc chắn muốn đăng xuất?',
+        showCancelButton: true,
+        confirmButtonText: 'Đăng xuất',
+        cancelButtonText: 'Hủy',
+        confirmButtonColor: '#dc3545',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            store.logout();
+        }
+    });
+};
 </script>
 <template>
     <div>
         <div class="container">
-            <div class="d-flex justify-content-between p-3 border">
+            <div class="d-flex justify-content-between p-3">
                 <div class="d-flex align-items-center">
-                    <h1>E-library</h1>
+                    <RouterLink
+                        :to="{
+                            name: 'home',
+                        }"
+                    >
+                        <FontAwesomeIcon :icon="faBookOpen" class="brand-icon" />
+                        <span class="brand-name fw-bold ms-1">E-LIBRARY</span></RouterLink
+                    >
                     <ul class="ms-5">
                         <li class="d-inline" v-for="item in menu" :key="item.path">
-                            <RouterLink :to="item.path" class="p-1 mx-3">{{ item.name }}</RouterLink>
+                            <RouterLink
+                                :to="item.path"
+                                :class="{
+                                    ['p-1 mx-3 fw-bold']: true,
+                                    'menu-nav-active':
+                                        item.path === '/'
+                                            ? router.currentRoute.value.path === item.path
+                                            : router.currentRoute.value.path.startsWith(item.path),
+                                }"
+                                >{{ item.name }}</RouterLink
+                            >
                         </li>
                     </ul>
                 </div>
@@ -73,6 +103,17 @@ const menu = [
     </div>
 </template>
 <style scoped>
+.brand-name {
+    color: var(--first-level-color);
+    font-size: 2.6rem;
+}
+.brand-icon {
+    color: var(--first-level-color);
+    font-size: 2.4rem;
+}
+.menu-nav-active {
+    color: var(--first-level-color);
+}
 .account-menu {
     display: none;
     background-color: white;

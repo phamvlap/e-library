@@ -85,7 +85,7 @@ class ReaderService {
     }
     async update(readerId, payload) {
         const filter = {
-            readerId,
+            reader_id: readerId,
         };
         const data = this.extractReaderData(payload);
         const reader = await Reader.findOneAndUpdate(

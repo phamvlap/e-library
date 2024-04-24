@@ -2,20 +2,23 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { toast } from 'vue3-toastify';
+import Swal from 'sweetalert2';
 import BookService from '@/services/book.service.js';
 import Helper from '@/utils/helper.js';
 import { useReaderStore } from '@/stores/reader.js';
-import { toast } from 'vue3-toastify';
 import BorrowingDetailService from '@/services/borrowingDetail.service.js';
 
 const route = useRoute();
 const router = useRouter();
 const bookId = route.params.id;
-let book = ref({});
-let selectedQuantity = ref(1);
 const store = useReaderStore();
 let reader = store.reader;
+
+let book = ref({});
+let selectedQuantity = ref(1);
+let isMounted = ref(false);
 
 const fetchBook = async (bookId) => {
     try {
@@ -41,7 +44,9 @@ const fetchBook = async (bookId) => {
 };
 const increaseQuantity = () => {
     if (selectedQuantity.value === book.value.book_quantity - book.value.book_borrowed_quantity) {
-        toast.error('Số lượng sách đã hết');
+        toast.error('Số lượng sách mượn đã đạt tới số lượng tối đa hiện có.', {
+            duration: 1500,
+        });
         return;
     } else {
         selectedQuantity.value += 1;
@@ -53,60 +58,95 @@ const decreaseQuantity = () => {
     }
 };
 const handleOrderBorrowing = async () => {
-    try {
-        const data = {
-            book_id: book.value._id,
-            reader_id: reader.reader_id,
-            borrowing_quantity: selectedQuantity.value,
-            borrowed_date: new Date().toISOString(),
-            status_updated_by: reader.reader_id,
-        };
-        const borrowingDetailService = new BorrowingDetailService();
-        const response = await borrowingDetailService.createBorrowingDetail(data);
-        if (response.status === 'success') {
-            toast.success('Đặt mượn sách thành công', {
-                duration: 1500,
-                onClose: () => {
-                    router.push({
-                        name: 'user.borrowed-books',
+    Swal.fire({
+        title: 'Xác nhận mượn sách',
+        text: 'Bạn có chắc chắn muốn mượn sách này?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Xác nhận',
+        cancelButtonText: 'Hủy',
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                const data = {
+                    book_id: book.value._id,
+                    reader_id: reader.reader_id,
+                    borrowing_quantity: selectedQuantity.value,
+                    borrowed_date: new Date().toISOString(),
+                    status_updated_by: reader.reader_id,
+                };
+                const borrowingDetailService = new BorrowingDetailService();
+                const response = await borrowingDetailService.createBorrowingDetail(data);
+                if (response.status === 'success') {
+                    toast.success('Đặt mượn sách thành công', {
+                        duration: 1500,
+                        onClose: () => {
+                            router.push({
+                                name: 'user.borrowed-books',
+                            });
+                        },
                     });
-                },
+                } else {
+                    throw new Error('Đặt mượn sách thất bại.');
+                }
+            } catch (error) {
+                toast.error(error.messag || 'Đặt mượn sách thất bại.', {
+                    duration: 1500,
+                });
+            }
+        }
+    });
+};
+const handleCancelBorrowing = () => {
+    Swal.fire({
+        title: 'Hủy mượn sách',
+        text: 'Bạn có chắc chắn muốn hủy mượn sách này?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Xác nhận',
+        cancelButtonText: 'Hủy',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            router.push({
+                name: 'books.list',
             });
         }
-    } catch (error) {
-        console.log(error);
-    }
+    });
 };
 
 onMounted(async () => {
     await fetchBook(bookId);
-    console.log(book.value);
+    isMounted.value = true;
 });
 </script>
 <template>
     <div class="p-2">
         <h2 class="text-center">Xác nhận mượn sách</h2>
-        <div class="row mt-4">
-            <div class="col col-md-6">
+        <div class="row mt-4" v-if="isMounted">
+            <div class="col col-md-7">
                 <h3 class="text-center title">Thông tin sách</h3>
-                <div class="d-flex justify-content-center align-item-center mt-3">
-                    <img :src="Helper.formatImageUrl(book.book_image)" alt="book" class="image" />
-                </div>
-                <h3 class="fw-bold book-name mt-5">{{ book.book_name }}</h3>
-                <div class="p-2 mt-2 text">
-                    <span class="fw-bold">Tác giả: </span>
-                    <span>{{ book.book_authors }}</span>
-                </div>
-                <div class="p-2 mt-2 text">
-                    <span class="fw-bold">Chủ đề: </span>
-                    <span>{{ book.topic_name }}</span>
-                </div>
-                <div class="p-2 mt-2 text">
-                    <span class="fw-bold">Nhà xuất bản: </span>
-                    <span>{{ book.publisher_name }}</span>
+                <div class="row mt-4">
+                    <div class="col col-md-3 d-flex justify-content-center align-item-center">
+                        <img :src="Helper.formatImageUrl(book.book_image)" alt="book" class="image" />
+                    </div>
+                    <div class="col col-md-9">
+                        <h3 class="fw-bold book-name">{{ book.book_name }}</h3>
+                        <div class="p-2 mt-2 text">
+                            <span class="fw-bold">Tác giả: </span>
+                            <span>{{ book.book_authors }}</span>
+                        </div>
+                        <div class="p-2 mt-2 text">
+                            <span class="fw-bold">Chủ đề: </span>
+                            <span>{{ book.topic_name }}</span>
+                        </div>
+                        <div class="p-2 mt-2 text">
+                            <span class="fw-bold">Nhà xuất bản: </span>
+                            <span>{{ book.publisher_name }}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col col-md-6">
+            <div class="col col-md-5">
                 <h3 class="text-center title">Thông tin độc giả</h3>
                 <div>
                     <div class="p-2 mt-2 text">
@@ -133,12 +173,16 @@ onMounted(async () => {
                         </div>
                     </div>
                 </div>
-                <div class="mt-4 text-center">
-                    <button class="btn btn-success" @click="handleOrderBorrowing">
-                        <FontAwesomeIcon :icon="faCheck" />
-                        <span class="ms-1">Xác nhận mượn</span>
-                    </button>
-                </div>
+            </div>
+            <div class="mt-4 text-center">
+                <button class="btn btn-danger" @click="handleCancelBorrowing">
+                    <FontAwesomeIcon :icon="faXmark" />
+                    <span class="ms-1">Hủy mượn</span>
+                </button>
+                <button class="btn btn-success ms-3" @click="handleOrderBorrowing">
+                    <FontAwesomeIcon :icon="faCheck" />
+                    <span class="ms-2">Xác nhận mượn</span>
+                </button>
             </div>
         </div>
     </div>
@@ -151,8 +195,8 @@ onMounted(async () => {
     line-height: 1.4;
 }
 .image {
-    width: 180px;
-    height: 260px;
+    width: 100%;
+    max-height: 180px;
     object-fit: cover;
 }
 </style>

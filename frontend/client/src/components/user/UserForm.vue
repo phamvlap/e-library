@@ -62,7 +62,7 @@ const validateDobAndGender = () => {
 };
 const submitReader = () => {
     validateDobAndGender();
-    if (Object.keys(errors.value).length > 0) {
+    if (Object.values(errors.value).filter((value) => value !== '').length > 0) {
         return;
     }
     $emits('submit:reader', localReader.value);

@@ -73,8 +73,19 @@ class BorrowingDetailService {
         return result;
     }
     async create(payload) {
+        const bookService = new BookService();
+
         const data = this.extractBorrowingDetailData(payload);
         const borrowingDetail = await BorrowingDetail.create(data);
+
+        const result = await bookService.findById(borrowingDetail.book_id);
+        const book = result[0];
+
+        await bookService.update(borrowingDetail.book_id, {
+            ...book,
+            book_borrowed_quantity: book.book_borrowed_quantity + borrowingDetail.borrowing_quantity,
+        });
+
         return borrowingDetail;
     }
     async update(readerId, bookId, borrowedDate, payload) {

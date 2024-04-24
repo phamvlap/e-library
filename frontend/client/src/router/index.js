@@ -11,6 +11,7 @@ const routes = [
         children: [
             {
                 path: '',
+                alias: 'home',
                 name: 'home',
                 component: () => import('@/pages/Home.vue'),
             },

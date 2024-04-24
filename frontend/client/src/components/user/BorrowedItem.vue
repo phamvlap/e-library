@@ -1,5 +1,4 @@
 <script setup>
-import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import Helper from '@/utils/helper.js';
 
@@ -24,7 +23,7 @@ const goToDetail = (bookId) => {
 };
 </script>
 <template>
-    <div class="border p-2" @click="goToDetail(book.book_id)">
+    <div class="border-bottom p-3 borrowed-item" @click="goToDetail(book.book_id)">
         <div class="row p-0 m-0">
             <div class="col col-md-3 p-0 d-flex justify-content-center align-items-center">
                 <img :src="book.book_image" alt="book" class="image" />
@@ -48,5 +47,9 @@ const goToDetail = (bookId) => {
     width: 80px;
     height: 80px;
     object-fit: cover;
+}
+.borrowed-item:hover {
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.09);
 }
 </style>

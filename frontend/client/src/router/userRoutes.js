@@ -4,6 +4,7 @@ export default {
     children: [
         {
             path: '',
+            alias: 'profile',
             name: 'user.profile',
             component: () => import('@/components/user/UserProfile.vue'),
         },

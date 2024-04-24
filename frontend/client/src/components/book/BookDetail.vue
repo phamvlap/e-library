@@ -6,7 +6,6 @@ import { faAngleLeft } from '@fortawesome/free-solid-svg-icons';
 import BookCard from './BookCard.vue';
 import BookService from '@/services/book.service.js';
 import Helper from '@/utils/helper.js';
-import { toast } from 'vue3-toastify';
 
 const route = useRoute();
 const router = useRouter();
@@ -15,7 +14,6 @@ let book = ref({});
 let similarBooks = ref([]);
 let activeImage = ref({});
 let isMounted = ref(false);
-let selectedQuantity = ref(0);
 
 const fetchBook = async (bookId) => {
     try {
@@ -65,25 +63,13 @@ const getSimilarBooks = async (topicId = null) => {
     }
 };
 const goToBorrowingOrder = (bookId) => {
+    console.log(bookId);
     router.push({
         name: 'user.borrowing-order',
         params: {
             id: bookId,
         },
     });
-};
-const increaseQuantity = () => {
-    if (selectedQuantity.value === book.value.book_quantity - book.value.book_borrowed_quantity) {
-        toast.error('Số lượng sách đã hết');
-        return;
-    } else {
-        selectedQuantity.value += 1;
-    }
-};
-const decreaseQuantity = () => {
-    if (selectedQuantity.value > 0) {
-        selectedQuantity.value -= 1;
-    }
 };
 
 onMounted(async () => {
@@ -128,7 +114,7 @@ onMounted(async () => {
                     </div>
                     <div class="p-2 mt-3">
                         <h3>Mô tả sơ lược</h3>
-                        <p class="text p-2">
+                        <p class="text p-2 text-description">
                             {{ book.book_description }}
                         </p>
                     </div>
@@ -151,26 +137,16 @@ onMounted(async () => {
                         <span class="fw-bold">Nhà xuất bản: </span>
                         <span>{{ book.publisher_name }}</span>
                     </div>
-                    <div class="px-2 py-3 d-flex align-items-center">
-                        <span class="fw-bold">Số lượng:</span>
-                        <div class="ms-4 border rounded-2">
-                            <button class="p-2" type="button" @click="decreaseQuantity">-</button>
-                            <span class="p-3">{{ selectedQuantity }}</span>
-                            <button class="p-2" type="button" @click="increaseQuantity">+</button>
-                        </div>
-                    </div>
                     <div class="mt-5 d-flex flex-column">
                         <div class="p-2">
-                            <button class="btn btn-outline-info" @click="goToBorrowingOrder(book.book_id)">
-                                Đặt mượn
-                            </button>
+                            <button class="btn btn-outline-info" @click="goToBorrowingOrder(book._id)">Đặt mượn</button>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="row mt-4">
                 <h2>Sách cùng chủ đề</h2>
-                <div class="row mt-3">
+                <div class="row mt-3" v-if="isMounted">
                     <div class="col col-md-2" v-for="book in similarBooks" :key="book._id">
                         <BookCard :book="book" />
                     </div>
@@ -184,7 +160,7 @@ onMounted(async () => {
     top: 50%;
     left: 0;
     transform: translateY(-50%);
-    color: var(--dark-text-color);
+    color: var(--first-level-color);
     cursor: pointer;
 }
 .image-list {
@@ -204,5 +180,8 @@ onMounted(async () => {
 }
 .text {
     line-height: 1.4;
+}
+.text-description {
+    text-align: justify;
 }
 </style>

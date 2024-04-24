@@ -4,6 +4,8 @@ import UserForm from '@/components/user/UserForm.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faPen } from '@fortawesome/free-solid-svg-icons';
 import { useReaderStore } from '@/stores/reader.js';
+import ReaderService from '@/services/reader.service.js';
+import { toast } from 'vue3-toastify';
 
 const store = useReaderStore();
 let reader = ref({
@@ -13,6 +15,20 @@ let isUpdating = ref(false);
 
 const transfromToUpdating = () => {
     isUpdating.value = true;
+};
+const updateReader = async (data) => {
+    try {
+        const readerService = new ReaderService();
+        console.log(data);
+        const response = await readerService.updateReader(reader.value.reader_id, data);
+        if (response.status === 'success') {
+            await store.getMe();
+            toast.success('Cập nhật thông tin độc giả thành công');
+            isUpdating.value = false;
+        }
+    } catch (error) {
+        toast.error('Cập nhật thông tin độc giả thất bại');
+    }
 };
 </script>
 <template>
@@ -28,7 +44,7 @@ const transfromToUpdating = () => {
         </h2>
         <div class="row mt-4">
             <div class="col col-md-8 offset-md-2">
-                <UserForm :reader="reader" :isUpdating="isUpdating" />
+                <UserForm :reader="reader" :isUpdating="isUpdating" @submit:reader="updateReader" />
             </div>
         </div>
     </div>

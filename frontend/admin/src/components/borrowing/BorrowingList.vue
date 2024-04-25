@@ -182,21 +182,6 @@ onMounted(async () => {
                     </button>
                 </div>
             </div>
-            <!-- search -->
-            <!-- <div>
-                <div class="input-group">
-                    <input
-                        type="text"
-                        class="form-control"
-                        placeholder="Nhập tên sách cần tìm"
-                        aria-describedby="search-book"
-                        v-model="filter.book_name"
-                    />
-                    <button class="btn btn-outline-secondary" type="button" id="search-book">
-                        <FontAwesomeIcon :icon="faSearch" />
-                    </button>
-                </div>
-            </div> -->
         </div>
         <!-- table -->
         <table class="table table-striped table-hover border mt-2">
@@ -231,7 +216,7 @@ onMounted(async () => {
                 </tr>
             </tbody>
         </table>
-        <nav class="mt-5">
+        <!-- <nav class="mt-5">
             <ul class="pagination justify-content-end custom-pagination">
                 <li class="page-item custom-pagination__item disabled">
                     <a class="page-link custom-pagination__link p-3">
@@ -247,7 +232,7 @@ onMounted(async () => {
                     </a>
                 </li>
             </ul>
-        </nav>
+        </nav> -->
     </div>
 </template>
 

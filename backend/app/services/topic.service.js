@@ -51,8 +51,9 @@ class TopicService {
         return topic;
     }
     async delete(_id) {
+        console.log(_id)
         const filter = {
-            _id: mongoose.isValidObjectId(_id) ? new mongoose.Types.ObjectId(_id) : null,
+            _id: new mongoose.Types.ObjectId(_id),
         };
         const topic = await Topic.findOneAndDelete(filter);
         return topic;

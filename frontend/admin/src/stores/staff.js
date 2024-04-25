@@ -37,7 +37,7 @@ export const useStaffStore = defineStore('staff', () => {
             staff.value = null;
             localStorage.removeItem('staff-is-logged-in');
             localStorage.removeItem('staff-token');
-            toast.error(error.message, {
+            toast.error('Mã số cán bộ hoặc mật khẩu không đúng', {
                 duration: 1500,
             });
         }

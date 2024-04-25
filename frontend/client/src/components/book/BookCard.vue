@@ -1,6 +1,8 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { toast } from 'vue3-toastify';
+import { useReaderStore } from '@/stores/reader.js';
 
 const props = defineProps({
     book: Object,
@@ -8,6 +10,7 @@ const props = defineProps({
 const book = ref({
     ...props.book,
 });
+const readerStore = useReaderStore();
 
 const router = useRouter();
 
@@ -20,12 +23,16 @@ const goToBookDetail = (bookId) => {
     });
 };
 const goToBorrowingOrder = (bookId) => {
-    router.push({
-        name: 'user.borrowing-order',
-        params: {
-            id: bookId,
-        },
-    });
+    if (readerStore.isAuth()) {
+        router.push({
+            name: 'borrowing-order.create',
+            query: {
+                book_id: bookId,
+            },
+        });
+    } else {
+        toast.error('Vui lòng đăng nhập để thực hiện đặt mượn.');
+    }
 };
 </script>
 <template>
@@ -60,6 +67,7 @@ const goToBorrowingOrder = (bookId) => {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: var(--max-line);
+    color: var(--first-level-color);
 }
 .card-subtitle {
     font-size: 1.4rem;

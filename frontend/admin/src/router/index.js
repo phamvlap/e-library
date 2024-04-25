@@ -4,6 +4,7 @@ import bookRoutes from './book.route.js';
 import readerRoutes from './reader.route.js';
 import borrowingRoutes from './borrowing.route.js';
 import staffRoutes from './staff.route.js';
+import topicRoutes from './topic.route.js';
 import { useStaffStore } from './../stores/staff.js';
 
 const routes = [
@@ -18,12 +19,14 @@ const routes = [
             {
                 path: '',
                 name: 'home',
-                component: () => import('@/pages/Home.vue'),
+                // component: () => import('@/pages/Home.vue'),
+                // component: () => import('@/components/book/BookList.vue'),
             },
             bookRoutes,
             readerRoutes,
             borrowingRoutes,
             staffRoutes,
+            topicRoutes,
         ],
     },
     {
@@ -39,8 +42,14 @@ const routes = [
     },
     {
         path: '/:pathMatch(.*)*',
-        name: 'notfound',
-        component: () => import('@/pages/NotFound.vue'),
+        component: () => import('@/layouts/EmptyLayout.vue'),
+        children: [
+            {
+                path: '',
+                name: 'not.found',
+                component: () => import('@/pages/NotFound.vue'),
+            },
+        ],
     },
 ];
 

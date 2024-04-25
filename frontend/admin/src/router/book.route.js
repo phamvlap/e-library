@@ -1,5 +1,6 @@
 export default {
     path: 'books',
+    alias: ['/', '/home'],
     name: 'books',
     component: () => import('@/pages/Books.vue'),
     children: [

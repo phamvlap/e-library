@@ -151,8 +151,8 @@ onMounted(async () => {
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="reader in readers" :key="reader._id">
-                    <th scope="row">1</th>
+                <tr v-for="(reader, index) in readers" :key="reader._id">
+                    <th scope="row">{{ index + 1 }}</th>
                     <td>{{ reader.reader_id }}</td>
                     <td>{{ reader.reader_first_name }}</td>
                     <td>{{ reader.reader_last_name }}</td>
@@ -169,7 +169,7 @@ onMounted(async () => {
                 </tr>
             </tbody>
         </table>
-        <nav class="mt-5">
+        <!-- <nav class="mt-5">
             <ul class="pagination justify-content-end custom-pagination">
                 <li class="page-item custom-pagination__item disabled">
                     <a class="page-link custom-pagination__link p-3">
@@ -185,7 +185,7 @@ onMounted(async () => {
                     </a>
                 </li>
             </ul>
-        </nav>
+        </nav> -->
     </div>
 </template>
 

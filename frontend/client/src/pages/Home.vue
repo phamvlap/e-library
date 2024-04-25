@@ -60,7 +60,7 @@ onMounted(async () => {
     <div>
         <div class="container">
             <div class="position-relative">
-                <img src="@/assets/images/background.jpg" alt="" class="w-100" />
+                <img src="@/assets/images/background.jpg" alt="" class="w-100 image" />
                 <div class="position-absolute greeting">
                     <h1 class="fw-bold message-title">Chào mừng bạn đến với E-library</h1>
                     <RouterLink to="/books" class="d-inline-block mt-3 py-4 px-5 bg-light link rounded-2 fw-bold"
@@ -106,7 +106,7 @@ onMounted(async () => {
     text-shadow: 10px 10px 10px rgba(0, 0, 0, 0.5);
 }
 .link {
-    color: var(--dark-text-color);
+    color: var(--first-level-color);
     font-size: 2rem;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
 }
@@ -116,5 +116,8 @@ onMounted(async () => {
 .section-title {
     font-size: 2.2rem;
     font-weight: bold;
+}
+.image {
+    background-color: rgba(0, 0, 0, 0.6);
 }
 </style>

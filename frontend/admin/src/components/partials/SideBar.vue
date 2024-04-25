@@ -5,13 +5,13 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { useStaffStore } from './../../stores/staff.js';
 
-const menuList = [
-    {
-        name: 'Trang chủ',
-        to: {
-            name: 'home',
-        },
-    },
+let menuList = [
+    // {
+    //     name: 'Trang chủ',
+    //     to: {
+    //         name: 'home',
+    //     },
+    // },
     {
         name: 'Quản lý sách',
         to: {
@@ -31,17 +31,30 @@ const menuList = [
         },
     },
     {
-        name: 'Quản lý nhân viên',
+        name: 'Quản lý thể loại',
         to: {
-            name: 'staff.list',
+            name: 'topic.list',
         },
     },
 ];
 const router = useRouter();
 const store = useStaffStore();
 const staff = store.staff;
+if (staff.staff_role === 'ADMIN') {
+    menuList.push({
+        name: 'Quản lý nhân viên',
+        to: {
+            name: 'staff.list',
+        },
+    });
+}
+
 let isMounted = ref(false);
 const currentPathName = computed(() => router.currentRoute.value.name);
+
+const handleLogout = () => {
+    store.logout();
+};
 
 onMounted(() => {
     isMounted.value = true;
@@ -62,7 +75,7 @@ onMounted(() => {
                         </div>
                         <ul class="dropdown-menu w-100">
                             <li class="dropdown-item p-3 dropdown__item">Tài khoản của tôi</li>
-                            <li class="dropdown-item p-3 dropdown__item">Đăng xuất</li>
+                            <li class="dropdown-item p-3 dropdown__item" @click="handleLogout">Đăng xuất</li>
                         </ul>
                     </div>
                 </div>
@@ -75,7 +88,7 @@ onMounted(() => {
                                 name: item.to.name,
                             }"
                             :class="{
-                                'd-inline-block w-100 p-3 menu-item': true,
+                                'd-inline-block w-100 p-3 menu-item fw-bold': true,
                                 'active-menu':
                                     item.to.name === 'home'
                                         ? currentPathName === item.to.name
@@ -121,6 +134,6 @@ onMounted(() => {
     background-color: rgba(0, 0, 0, 0.1);
 }
 .active-menu {
-    background-color: rgba(0, 0, 0, 0.1);
+    color: var(--first-level-color);
 }
 </style>

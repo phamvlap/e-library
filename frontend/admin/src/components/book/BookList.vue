@@ -192,7 +192,10 @@ onMounted(async () => {
                     <th scope="col">Thao tác</th>
                 </tr>
             </thead>
-            <tbody>
+            <tr v-if="books.length === 0">
+                <td colspan="8" class="text-center">Không có dữ liệu</td>
+            </tr>
+            <tbody v-else>
                 <tr v-for="(book, index) in books" :key="index">
                     <th scope="row">{{ index + 1 }}</th>
                     <td>

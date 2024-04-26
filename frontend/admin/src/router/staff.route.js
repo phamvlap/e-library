@@ -19,4 +19,7 @@ export default {
             component: () => import('@/components/staff/StaffAdd.vue'),
         },
     ],
+    meta: {
+        requiresAuth: true,
+    },
 };

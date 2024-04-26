@@ -2,59 +2,57 @@
 import { ref, onMounted } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faTrash, faPen, faRotate } from '@fortawesome/free-solid-svg-icons';
-import TopicService from '@/services/topic.service.js';
+import PublisherService from '@/services/publisher.service.js';
 import { toast } from 'vue3-toastify';
 import Swal from 'sweetalert2';
-import TopicForm from './TopicForm.vue';
+import PublisherForm from './PublisherForm.vue';
 
-const topics = ref([]);
-let topic = ref({
-    topic_name: '',
+const publishers = ref([]);
+let publisher = ref({
+    publisher_name: '',
+    publisher_address: '',
 });
 let isUpdating = ref(false);
 let isMounted = ref(false);
 
 const handleRefresh = async () => {
-    await fetchTopics();
-    topic.value = {
-        topic_name: '',
+    await fetchPublishers();
+    publisher.value = {
+        publisher_name: '',
+        publisher_address: '',
     };
     isUpdating.value = false;
 };
-const fetchTopics = async () => {
+const fetchPublishers = async () => {
     try {
-        const topicService = new TopicService();
-        const response = await topicService.getTopics();
+        const publisherService = new PublisherService();
+        const response = await publisherService.getPublishers();
         if (response.status === 'success') {
-            topics.value = response.data;
+            publishers.value = response.data;
         }
     } catch (error) {
-        topics.value = [];
+        publishers.value = [];
     }
 };
 const handleSubmit = async (data) => {
     try {
-        const topicService = new TopicService();
+        const publisherService = new PublisherService();
         let response = null;
         if (data._id) {
-            response = await topicService.updateTopic(data._id, data);
+            response = await publisherService.updatePublisher(data._id, data);
         } else {
-            response = await topicService.createTopic(data);
+            response = await publisherService.createPublisher(data);
         }
         if (response.status === 'success') {
-            await fetchTopics();
-            toast.success(`${data._id ? 'Cật nhật chủ đề thành công' : 'Thêm chủ đề mới thành công'}`, {
+            await fetchPublishers();
+            toast.success(`${data._id ? 'Cật nhật nhà xuất bản thành công' : 'Thêm nhà xuất bản mới thành công'}`, {
                 duration: 1000,
-                onClose: () => {
-                    topic.value = {
-                        topic_name: '',
-                    };
-                    isUpdating.value = false;
+                onClose: async () => {
+                    await handleRefresh();
                 },
             });
-            // handleRefresh();
         } else {
-            toast.error(`${data._id ? 'Cật nhật chủ đề thất bại' : 'Thêm chủ đề mới thất bại'}`, {
+            toast.error(`${data._id ? 'Cật nhật nhà xuất bản thất bại' : 'Thêm nhà xuất bản mới thất bại'}`, {
                 duration: 1000,
             });
         }
@@ -64,9 +62,9 @@ const handleSubmit = async (data) => {
         });
     }
 };
-const handleDelete = async (topicId) => {
+const handleDelete = async (publisherId) => {
     Swal.fire({
-        title: 'Bạn có chắc chắn muốn xóa chủ đề này không?',
+        title: 'Bạn có chắc chắn muốn xóa nhà xuất bản này không?',
         text: 'Dữ liệu sẽ không thể khôi phục sau khi xóa',
         icon: 'warning',
         showCancelButton: true,
@@ -77,15 +75,15 @@ const handleDelete = async (topicId) => {
     }).then(async (result) => {
         if (result.isConfirmed) {
             try {
-                const topicService = new TopicService();
-                const response = await topicService.deleteTopic(topicId);
+                const publisherService = new PublisherService();
+                const response = await publisherService.deletePublisher(publisherId);
                 if (response.status === 'success') {
-                    await fetchTopics();
-                    toast.success('Xóa chủ đề thành công', {
+                    await fetchPublishers();
+                    toast.success('Xóa nhà xuất bản thành công', {
                         duration: 1000,
                     });
                 } else {
-                    toast.error('Xóa chủ đề thất bại', {
+                    toast.error('Xóa nhà xuất bản thất bại', {
                         duration: 1000,
                     });
                 }
@@ -98,44 +96,46 @@ const handleDelete = async (topicId) => {
     });
 };
 const handleUpdate = async (id) => {
-    const topicService = new TopicService();
-    const response = await topicService.getTopic(id);
+    const publisherService = new PublisherService();
+    const response = await publisherService.getPublisher(id);
     if (response.status === 'success') {
-        topic.value = response.data;
+        publisher.value = response.data;
         isUpdating.value = true;
     }
 };
 
 onMounted(async () => {
-    await fetchTopics();
+    await fetchPublishers();
     isMounted.value = true;
 });
 </script>
 
 <template>
     <div class="p-2">
-        <h1 class="p-2 text-center">Danh sách chủ đề</h1>
+        <h1 class="p-2 text-center">Danh sách nhà xuất bản</h1>
         <div class="row">
-            <div class="col col-md-6 p-3">
+            <div class="col col-md-7 p-3">
                 <!-- table -->
                 <table class="table table-striped table-hover border mt-2" v-if="isMounted">
                     <thead>
                         <tr>
                             <th scope="col">#</th>
-                            <th scope="col">Tên chủ đề</th>
+                            <th scope="col">Tên nhà xuất bản</th>
+                            <th scope="col">Địa chỉ</th>
                             <th scope="col">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(topic, index) in topics" :key="topic._id">
+                        <tr v-for="(publisher, index) in publishers" :key="publisher._id">
                             <th scope="row">{{ index + 1 }}</th>
-                            <td>{{ topic.topic_name }}</td>
+                            <td>{{ publisher.publisher_name }}</td>
+                            <td>{{ publisher.publisher_address }}</td>
                             <td>
-                                <button class="btn btn-warning" @click="handleUpdate(topic._id)">
+                                <button class="btn btn-warning" @click="handleUpdate(publisher._id)">
                                     <FontAwesomeIcon :icon="faPen" />
                                     <span class="ms-2">Chỉnh sửa</span>
                                 </button>
-                                <button class="btn btn-danger ms-3" @click="handleDelete(topic._id)">
+                                <button class="btn btn-danger ms-3" @click="handleDelete(publisher._id)">
                                     <FontAwesomeIcon :icon="faTrash" />
                                     <span class="ms-2">Xóa</span>
                                 </button>
@@ -150,10 +150,10 @@ onMounted(async () => {
                     </button>
                 </div>
             </div>
-            <div class="col col-md-6 p-3">
-                <h2 class="text-center">{{ isUpdating ? 'Cập nhật chủ đề' : 'Thêm chủ đề mới' }}</h2>
+            <div class="col col-md-5 p-3">
+                <h2 class="text-center">{{ isUpdating ? 'Cập nhật nhà xuất bản' : 'Thêm nhà xuất bản mới' }}</h2>
                 <div class="p-3 mt-3" v-if="isMounted">
-                    <TopicForm :topic="topic" @submit:topic="handleSubmit" :isUpdating="isUpdating" />
+                    <PublisherForm :publisher="publisher" @submit:publisher="handleSubmit" :isUpdating="isUpdating" />
                 </div>
             </div>
         </div>
@@ -178,7 +178,7 @@ td:last-child {
 .select {
     font-size: 1.6rem;
 }
-#select-topic,
+#select-publisher,
 .label,
 .select-item {
     font-size: 1.6rem;

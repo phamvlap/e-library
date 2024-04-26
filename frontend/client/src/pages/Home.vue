@@ -63,7 +63,9 @@ onMounted(async () => {
                 <img src="@/assets/images/background.jpg" alt="" class="w-100 image" />
                 <div class="position-absolute greeting">
                     <h1 class="fw-bold message-title">Chào mừng bạn đến với E-library</h1>
-                    <RouterLink to="/books" class="d-inline-block mt-3 py-4 px-5 bg-light link rounded-2 fw-bold"
+                    <RouterLink :to="{
+                        name: 'books.list'
+                    }" class="d-inline-block mt-3 py-4 px-5 bg-light link rounded-2 fw-bold"
                         >Khám phá ngay</RouterLink
                     >
                 </div>
@@ -76,7 +78,9 @@ onMounted(async () => {
                     </div>
                 </div>
                 <div class="d-flex justify-content-center mt-2">
-                    <RouterLink to="/books" class="d-inline-block p-1">Xem tất cả</RouterLink>
+                    <RouterLink :to="{
+                        name: 'books.list'
+                    }" class="d-inline-block p-1">Xem tất cả</RouterLink>
                 </div>
             </div>
             <div class="mt-4">
@@ -87,7 +91,9 @@ onMounted(async () => {
                     </div>
                 </div>
                 <div class="d-flex justify-content-center mt-2">
-                    <RouterLink to="/books" class="d-inline-block p-1">Xem tất cả</RouterLink>
+                    <RouterLink :to="{
+                        name: 'books.list'
+                    }" class="d-inline-block p-1">Xem tất cả</RouterLink>
                 </div>
             </div>
         </div>

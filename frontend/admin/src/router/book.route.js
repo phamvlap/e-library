@@ -1,6 +1,5 @@
 export default {
     path: 'books',
-    alias: ['/', '/home'],
     name: 'books',
     component: () => import('@/pages/Books.vue'),
     children: [
@@ -25,4 +24,7 @@ export default {
             component: () => import('@/components/book/BookDetail.vue'),
         },
     ],
+    meta: {
+        requiresAuth: true,
+    },
 };

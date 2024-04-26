@@ -9,4 +9,7 @@ export default {
             component: () => import('@/components/reader/ReaderList.vue'),
         },
     ],
+    meta: {
+        requiresAuth: true,
+    },
 };

@@ -11,6 +11,7 @@ let reader = store.reader;
 const route = useRoute();
 let borrowedBooks = ref([]);
 let isMounted = ref(false);
+// let currentId = ref('');
 
 let currentPath = computed(() => {
     return route.path;
@@ -51,6 +52,15 @@ const fetchBooksOfUser = async () => {
         console.log(error);
     }
 };
+// const activeBook = (bookId) => {
+    // console.log(bookId)
+    // router.push({
+    //     name: 'user.borrowed-book-detail',
+    //     params: {
+    //         id: bookId,
+    //     },
+    // });
+// };  
 onMounted(async () => {
     await fetchBooksOfUser();
     isMounted.value = true;
@@ -58,7 +68,7 @@ onMounted(async () => {
 </script>
 <template>
     <div class="p-2">
-        <h2 class="text-center">Sách mượn</h2>
+        <h2 class="text-center">Sách mượn của tôi</h2>
         <div class="row p-0 m-0 mt-3" v-if="isMounted">
             <div class="col col-md-6 p-2">
                 <h2 class="text-center mb-2">Danh sách sách mượn</h2>
@@ -74,4 +84,5 @@ onMounted(async () => {
         </div>
     </div>
 </template>
-<style scoped></style>
+<style scoped>  
+</style>

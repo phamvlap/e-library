@@ -6,6 +6,7 @@ import { faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import StaffForm from './StaffForm.vue';
 import StaffService from '@/services/staff.service.js';
 import { toast } from 'vue3-toastify';
+import Swal from 'sweetalert2';
 
 const router = useRouter();
 const route = useRoute();
@@ -25,17 +26,34 @@ const submitStaff = async (data) => {
         const staffService = new StaffService();
         if (isUpdating) {
             await staffService.updateStaff(staffId, data);
+            toast.success('Cập nhật nhân viên thành công', {
+                duration: 2500,
+                onClose: () => {
+                    router.push({
+                        name: 'staff.list',
+                    });
+                },
+            });
         } else {
-            await staffService.createStaff(data);
+            const response = await staffService.createStaff(data);
+            if(response.status === 'success') {
+                const account = response.data.account;
+                Swal.fire({
+                    title: 'Tạo tài khoản thành công',
+                    html: `<div>
+                        <h2>Tài khoản của nhân viên mới vừa được tạo</h2>
+                        <br>Mã nhân viên: <b>${account.account_id}</b><br>Mật khẩu: <b>${account.account_password}</b></div>`,
+                    icon: 'success',
+                    confirmButtonText: 'Đóng',
+                }).then((result) => {
+                    if(result.isConfirmed) {
+                        router.push({
+                            name: 'staff.list',
+                        });
+                    }
+                })
+            }
         }
-        toast.success(`${isUpdating ? 'Cập nhật' : 'Thêm'} nhân viên thành công`, {
-            duration: 2500,
-            onClose: () => {
-                router.push({
-                    name: 'staff.list',
-                });
-            },
-        });
     } catch (error) {
         toast.error(`${isUpdating ? 'Cập nhật' : 'Thêm'} nhân viên thất bại`, {
             duration: 2500,

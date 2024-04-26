@@ -86,7 +86,9 @@ onMounted(async () => {
                 <h1>Chi tiết sách</h1>
                 <div class="d-flex align-items-center position-absolute back-btn">
                     <FontAwesomeIcon :icon="faAngleLeft" />
-                    <RouterLink to="/books" class="ms-2">Quay lại</RouterLink>
+                    <RouterLink :to="{
+                        name: 'books.list'
+                    }" class="ms-2">Quay lại</RouterLink>
                 </div>
             </div>
             <div class="row mt-4" v-if="isMounted">

@@ -5,6 +5,7 @@ import readerRoutes from './reader.route.js';
 import borrowingRoutes from './borrowing.route.js';
 import staffRoutes from './staff.route.js';
 import topicRoutes from './topic.route.js';
+import publisherRoutes from './publisher.route.js';
 import { useStaffStore } from './../stores/staff.js';
 
 const routes = [
@@ -12,21 +13,21 @@ const routes = [
         path: '/',
         alias: '/admin',
         component: () => import('@/layouts/MainLayout.vue'),
-        meta: {
-            requiresAuth: true,
-        },
         children: [
             {
                 path: '',
                 name: 'home',
-                // component: () => import('@/pages/Home.vue'),
-                // component: () => import('@/components/book/BookList.vue'),
+                component: () => import('@/pages/Home.vue'),
+                meta: {
+                    requiresAuth: true,
+                },
             },
             bookRoutes,
             readerRoutes,
             borrowingRoutes,
             staffRoutes,
             topicRoutes,
+            publisherRoutes,
         ],
     },
     {

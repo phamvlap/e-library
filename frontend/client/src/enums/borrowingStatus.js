@@ -1,7 +1,7 @@
 class BorrowingStatus {
     static viewStatus = {
         PENDING: 'Đang chờ xác nhận',
-        CONFIRMED: 'Đã xác nhận',
+        CONFIRMED: 'Đã được xác nhận',
         BORROWED: 'Đang mượn',
         RETURNED: 'Đã trả',
         CANCELED: 'Đã hủy',

@@ -13,10 +13,16 @@ const menu = [
     {
         name: 'Trang chủ',
         path: '/',
+        to: {
+            name: 'home',
+        }
     },
     {
         name: 'Sách',
         path: '/books',
+        to: {
+            name: 'books.list',
+        }
     },
 ];
 
@@ -50,7 +56,9 @@ const handleLogout = () => {
                     <ul class="ms-5">
                         <li class="d-inline" v-for="item in menu" :key="item.path">
                             <RouterLink
-                                :to="item.path"
+                                :to="{
+                                    name: item.to.name,
+                                }"
                                 :class="{
                                     ['p-1 mx-3 fw-bold']: true,
                                     'menu-nav-active':
@@ -94,8 +102,12 @@ const handleLogout = () => {
                         </div>
                     </div>
                     <div class="d-flex align-items-center" v-else>
-                        <RouterLink to="/login" class="me-3">Đăng nhập</RouterLink>
-                        <RouterLink to="/register">Đăng ký</RouterLink>
+                        <RouterLink :to="{
+                            name: 'login'
+                        }" class="me-3">Đăng nhập</RouterLink>
+                        <RouterLink :to="{
+                            name: 'register'
+                        }">Đăng ký</RouterLink>
                     </div>
                 </div>
             </div>

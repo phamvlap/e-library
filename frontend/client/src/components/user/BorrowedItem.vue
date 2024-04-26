@@ -9,11 +9,13 @@ const props = defineProps({
         required: true,
     },
 });
+// const $emits = defineEmits(['book:active']);
 const book = {
     ...props.book,
 };
 
 const goToDetail = (bookId) => {
+    // $emits('book:active', bookId);
     router.push({
         name: 'user.borrowed-book-detail',
         params: {

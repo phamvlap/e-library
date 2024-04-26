@@ -9,4 +9,7 @@ export default {
             component: () => import('@/components/topic/TopicList.vue'),
         },
     ],
+    meta: {
+        requiresAuth: true,
+    },
 };

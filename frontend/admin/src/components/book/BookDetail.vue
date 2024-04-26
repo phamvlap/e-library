@@ -61,7 +61,9 @@ const handleDelete = () => {
                 const response = await bookService.deleteBook(bookId);
                 if (response.status === 'success') {
                     Swal.fire('Đã xóa!', 'Sách đã được xóa thành công.', 'success');
-                    router.push('/admin/books');
+                    router.push({
+                        name: 'book.list',
+                    });
                 }
             } catch (error) {
                 Swal.fire('Lỗi!', 'Đã có lỗi xảy ra.', 'error');

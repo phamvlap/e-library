@@ -15,6 +15,7 @@ const router = useRouter();
 const bookId = route.params.id;
 const store = useReaderStore();
 let reader = store.reader;
+const MAX_BORROWING_QUANTITY = 5;
 
 let book = ref({});
 let selectedQuantity = ref(1);
@@ -43,8 +44,8 @@ const fetchBook = async (bookId) => {
     }
 };
 const increaseQuantity = () => {
-    if (selectedQuantity.value === book.value.book_quantity - book.value.book_borrowed_quantity) {
-        toast.error('Số lượng sách mượn đã đạt tới số lượng tối đa hiện có.', {
+    if (selectedQuantity.value === MAX_BORROWING_QUANTITY) {
+        toast.error(`Số lượng sách tối đa của mỗi lần mượn là ${MAX_BORROWING_QUANTITY}`, {
             duration: 1500,
         });
         return;

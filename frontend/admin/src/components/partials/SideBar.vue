@@ -4,14 +4,15 @@ import { useRouter } from 'vue-router';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { useStaffStore } from './../../stores/staff.js';
+import Swal from 'sweetalert2';
 
 let menuList = [
-    // {
-    //     name: 'Trang chủ',
-    //     to: {
-    //         name: 'home',
-    //     },
-    // },
+    {
+        name: 'Trang chủ',
+        to: {
+            name: 'home',
+        },
+    },
     {
         name: 'Quản lý sách',
         to: {
@@ -36,6 +37,12 @@ let menuList = [
             name: 'topic.list',
         },
     },
+    {
+        name: 'Quản lý nhà xuất bản',
+        to: {
+            name: 'publisher.list',
+        },
+    },
 ];
 const router = useRouter();
 const store = useStaffStore();
@@ -53,7 +60,18 @@ let isMounted = ref(false);
 const currentPathName = computed(() => router.currentRoute.value.name);
 
 const handleLogout = () => {
-    store.logout();
+    Swal.fire({
+        title: 'Đăng xuất',
+        text: 'Bạn có chắc chắn muốn đăng xuất?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Đăng xuất',
+        cancelButtonText: 'Hủy',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            store.logout();
+        }
+    });
 };
 
 onMounted(() => {
